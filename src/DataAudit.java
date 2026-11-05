@@ -35,6 +35,9 @@ public class DataAudit {
 	 * exclusions per object instance.
 	 *
 	 * @author Andrew Zuniga
+	 * @author Minghao Dong
+	 * @author Bobby Lu
+	 * @author Genesis Vejar
 	 */
 	public DataAudit() {
 		// Nothing to do: the exclusion set is initialized at its declaration.
@@ -66,7 +69,7 @@ public class DataAudit {
 	 * @param entries the transactions to check
 	 * @throws IllegalArgumentException if {@code entries} is null
 	 * @return list of findings, one per duplicated entry
-	 * @author Andrew Zuniga
+	 * @author Genesis Vejar
 	 */
 	private List<AuditFinding> findDuplicates(List<Entry> entries) {
 		// TODO: group by (date, category, amount) and flag groups larger than one
@@ -82,7 +85,7 @@ public class DataAudit {
 	 * @param entries the transactions to check
 	 * @throws IllegalArgumentException if {@code entries} is null
 	 * @return list of findings, one per anomalous entry
-	 * @author Andrew Zuniga
+	 * @author Bobby Lu
 	 */
 	private List<AuditFinding> findAnomalies(List<Entry> entries) {
 		// TODO: compute a typical monthly amount per category and flag outliers
@@ -94,7 +97,7 @@ public class DataAudit {
 	 *
 	 * @param categories the categories to exclude; an empty set means none
 	 * @throws IllegalArgumentException if {@code categories} is null
-	 * @author Andrew Zuniga
+	 * @author Minghao Dong
 	 */
 	public void setExcludedCategories(Set<String> categories) {
 		// TODO: store a defensive copy
@@ -104,7 +107,7 @@ public class DataAudit {
 	 * Returns the categories currently excluded from the audit.
 	 *
 	 * @return an unmodifiable set of excluded categories, never null
-	 * @author Andrew Zuniga
+	 * @author Minghao Dong
 	 */
 	public Set<String> getExcludedCategories() {
 		// TODO: return an unmodifiable view
@@ -114,14 +117,14 @@ public class DataAudit {
 	/**
 	 * Removes all excluded categories so the next audit checks everything.
 	 *
-	 * @author Andrew Zuniga
+	 * @author Minghao Dong
 	 */
 	public void clearExcludedCategories() {
 		// TODO: empty the exclusion set
 	}
 
 	/**
-	 * Turns findings into report text for the shared menu to display. Findings
+	 * Turns findings into a formatted report text ready for the shared menu to display. Findings
 	 * should be grouped sensibly (for example income and expense), and an empty
 	 * list should produce a clear "no issues found" message.
 	 *
