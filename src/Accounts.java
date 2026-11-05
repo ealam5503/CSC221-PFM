@@ -1,7 +1,7 @@
 import java.util.Map;
 
 /**
- * takes care of  user accounts for the PFM: creating an account, signing in,
+ * Handles user accounts for the PFM: creating an account, signing in,
  * signing out, changing a password, and deleting an account.
  *
  * Passwords and secret answers are never saved as plain text. They are
@@ -40,14 +40,14 @@ public class Accounts {
     /**
      * Signs a user in if the user name and password are correct.
      *
-     * @param userName the user name typed by the user
-     * @param password the password typed by the user
-     * @return true if the sign in worked, false if the user name or
-     *         password is wrong
+     * @param userName      the user name typed by the user
+     * @param password      the password typed by the user
+     * @return              true if the sign in worked, false if the user name or
+     *                      password is wrong
      * @author Ousseynou Diop
      */
     public boolean signIn(String userName, String password) {
-        // implementation part
+        // TODO: Implement signIn.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -57,59 +57,58 @@ public class Accounts {
      * @author Ousseynou Diop
      */
     public void signOut() {
-        // implementation part
+        // TODO: Implement signOut.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * is Signed in Checks if someone is signed in.
+     * Checks if someone is signed in.
      *
      * @return true if a user is signed in, false otherwise
      * @author Ousseynou Diop
      */
     public boolean isSignedIn() {
-        // implement
+        // TODO: Implement isSignedIn.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Gets the user name of the person who is signed in.
+     * Gets the username of the person who is signed in.
      *
-     * @return the current user name, or null if nobody is signed in
+     * @return the current username, or null if nobody is signed in
      * @author Ousseynou Diop
      */
     public String getCurrentUserName() {
-        // Implementation part
+        // TODO: Implement getCurrentUserName.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * register user creates a new account and saves it. The password and secret answer
+     * Creates a new account and saves it. The password and secret answer
      * are hashed before saving.
      *
      * @param userName       the new user name
      * @param password       the new password
      * @param secretQuestion the secret question the user picked
      * @param secretAnswer   the answer to the secret question
-     * @return true if the account was created, false if the user name is
-     *         already taken
+     * @return true if the account was created, false if the user name is already taken
      * @author Ousseynou Diop
+     * @author Wasif Ahmed
      */
-    public boolean registerUser(String userName, String password,
-                                String secretQuestion, String secretAnswer) {
-        // TODO: implement.
+    public boolean registerUser(String userName, String password, String secretQuestion, String secretAnswer) {
+        // TODO: Implement registerUser.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
      * Checks if a user name is already taken.
      *
-     * @param userName the user name to check
-     * @return true if an account with this user name exists, false otherwise
+     * @param userName      the user name to check
+     * @return              true if an account with this user name exists, false otherwise
      * @author Ousseynou Diop
      */
     public boolean userExists(String userName) {
-        // implementation part
+        // TODO: Implement userExists.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -117,14 +116,14 @@ public class Accounts {
      * Changes the password of the signed in user. The user must type their
      * current password first.
      *
-     * @param currentPassword the user's current password
-     * @param newPassword     which is the new password
-     * @return true if the password was changed, false if the current
-     *         password is wrong
+     * @param currentPassword       the user's current password
+     * @param newPassword           the new password
+     * @return                      true if the password was changed, false if the current
+*                                   password is wrong
      * @author Ousseynou Diop
      */
     public boolean changePassword(String currentPassword, String newPassword) {
-        // implement here
+        // TODO: Implement changePassword.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -135,12 +134,12 @@ public class Accounts {
      * @param userName     the user name of the account
      * @param secretAnswer the answer to the secret question
      * @param newPassword  the new password
-     * @return true if the password was changed, false if the user name or
-     *         answer is wrong
+     * @return             true if the password was changed, false if the user name or
+     *                     answer is wrong
      * @author Ousseynou Diop
      */
     public boolean changePassword(String userName, String secretAnswer, String newPassword) {
-        // implemention
+        // TODO: Implement changePassword (using secretAnswer).
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -148,12 +147,12 @@ public class Accounts {
      * Gets the secret question of an account, so it can be shown to a user
      * who forgot their password.
      *
-     * @param userName the user name of the account
-     * @return the secret question, or null if the user name does not exist
+     * @param userName      the user name of the account
+     * @return              the secret question, or null if the user name does not exist
      * @author Ousseynou Diop
      */
     public String getSecretQuestion(String userName) {
-        // implemention
+        // TODO: Implement getSecretQuestion.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -162,49 +161,51 @@ public class Accounts {
      * data, then signs them out. The user must type their password to
      * confirm.
      *
-     * @param password which is the user's password
-     * @return true if the account was deleted, false if the password is wrong
+     * @param password      the user's password
+     * @return              true if the account was deleted, false if the password is wrong
      * @author Ousseynou Diop
      */
     public boolean deleteUser(String password) {
-        // implement.
+        // TODO: Implement deleteUser.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * it hashes a password or secret answer so it is not saved as plain text.
+     * Hashes a password or secret answer so it is not saved as plain text.
      * The same text and salt always give the same result.
      *
-     * @param plainText the password or answer to hash
-     * @param salt      a random value saved with the user's account
-     * @return the hashed text
+     * @param plainText     the password or answer to hash
+     * @param salt          a random value saved with the user's account
+     * @return              the hashed text
      * @author Ousseynou Diop
+     * @author Wasif Ahmed
      */
     public static String hashPassword(String plainText, String salt) {
-        // implemention
+        // TODO: Implement hashPassword.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * this creates a new random salt for a new account. salt is a random value that's added before hashing  
-     * to prevent two people with same password having the same hash based on. I know this teechnique from online search
+     * This creates a new random salt for a new account. The salt is a random value that's added before hashing  
+     * to prevent two people with same password having the same hash based on.
      *
      * @return a random salt
      * @author Ousseynou Diop
+     * @author Wasif Ahmed
      */
     private static String generateSalt() {
-        // implement.
+        // TODO: Implement generateSalt.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
      * Reads all accounts from the users file.
      *
-     * @return all  the saved accounts, looked up by user name
+     * @return all the saved accounts, looked up by user name
      * @author Ousseynou Diop
      */
     private Map<String, UserAccount> loadUsers() {
-        // implement
+        // TODO: Implement loadUsers.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -214,7 +215,7 @@ public class Accounts {
      * @author Ousseynou Diop
      */
     private void saveUsers() {
-        // implement
+        // TODO: Implement saveUsers.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

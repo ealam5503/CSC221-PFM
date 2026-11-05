@@ -2,20 +2,16 @@
  * Holds the saved information for one user account. The password and
  * secret answer are stored only as hashes, never as plain text.
  *
- * @param userName         this is the user's name
- * @param salt             this is the random value used when hashing
- * @param passwordHash     this is the hashed password
- * @param secretQuestion   this is the user's secret question that's going to be used for some identity verification
- * @param secretAnswerHash this is the hashed secret answer
+ * @param userName         the user's name
+ * @param salt             the random value used when hashing
+ * @param passwordHash     the hashed password
+ * @param secretQuestion   the user's secret question that's going to be used for some identity verification
+ * @param secretAnswerHash the hashed secret answer
  *
  * @author Ousseynou Diop
  */
-public record UserAccount(String userName,
-                           String salt,
-                          String passwordHash,
-                          String secretQuestion,
-                          String secretAnswerHash) {
-
+public record UserAccount(String userName, String salt, String passwordHash, String secretQuestion, String secretAnswerHash) 
+{
     /**
      * Turns this account into one line of text for the users file so it can be saved in users.csv file.
      *
