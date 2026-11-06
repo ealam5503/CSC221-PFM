@@ -123,7 +123,18 @@ public class Validation {
      * @author Yugin Belbase
      */
     public enum InputType {
-        MENU_CHOICE, YES_NO, YEAR, USERNAME, PASSWORD, TEXT
+        //* User is navigating the menu
+        MENU_CHOICE, 
+        //* User is choosing if they want to display CSV file with data in incorrect format
+        YES_NO, 
+        //* Year of date in CSV file
+        YEAR, 
+        //* User is inputing their username
+        USERNAME, 
+        //* User is inputing their password
+        PASSWORD, 
+        //* All other inputs
+        TEXT
     }
 
     
