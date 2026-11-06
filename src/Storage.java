@@ -41,6 +41,7 @@ public class Storage {
      * @param fileName the name or path of the file to write
      * @param content the lines of data to write into the file
      * @throws IOException if the file cannot be written
+     * @author Juan Balbuena
      */
     public void writeFile(String fileName, List<String> content) throws IOException {
     }
