@@ -38,34 +38,34 @@ public class Validation {
     * Categories allowed in CSV file
     * @author Eliott Edeki
     */
-    enum Categories{
-        //* Income: Net pay after deductions
+    public enum Categories{
+        /** Income: Net pay after deductions*/
         COMPENSATION, 
-        //* Income: Contributions from others
+        /** Income: Contributions from others*/
         ALLOWANCE, 
-        //* Income: Unearned income after taxes
+        /** Income: Unearned income after taxes*/
         INVESTMENTS,
-        //* Income: Any other income
+        /** Income: Any other income*/
         INCOME_OTHER,
-        //* Expense: Expenses related to housing
+        /** Expense: Expenses related to housing*/
         HOME, 
-        //* Expense: Energy and internet for home
+        /** Expense: Energy and internet for home*/
         UTILITIES, 
-        //* Expense: Non-entertainment spending on food
+        /** Expense: Non-entertainment spending on food*/
         FOOD,
-        //* Expense: Clothing, cosmetics
+        /** Expense: Clothing, cosmetics*/
         APPEARANCE, 
-        //* Expense: Unreimbursed work-related purchases
+        /** Expense: Unreimbursed work-related purchases*/
         WORK, 
-        //* Expense: School tuition, tutors or supplies
+        /** Expense: School tuition, tutors or supplies*/
         EDUCATION, 
-        //* Expense: Costs of transit fares or personal vehicle use
+        /** Expense: Costs of transit fares or personal vehicle use*/
         TRANSPORTATION,
-        //* Expense: Non-essential purchases for entertainment such as vacations or gifts
+        /** Expense: Non-essential purchases for entertainment such as vacations or gifts*/
         ENTERTAINMENT, 
-        //* Expense: Fees from professionals such as lawyers or doctors
+        /** Expense: Fees from professionals such as lawyers or doctors*/
         PROFESSIONAL_SERVICES,
-        //* Expense: Other expenses not previously mentioned
+        /** Expense: Other expenses not previously mentioned*/
         EXPENSE_OTHER}
     
     /**
@@ -123,17 +123,17 @@ public class Validation {
      * @author Yugin Belbase
      */
     public enum InputType {
-        //* User is navigating the menu
+        /** User is navigating the menu*/
         MENU_CHOICE, 
-        //* User is choosing if they want to display CSV file with data in incorrect format
+        /** User is choosing if they want to display CSV file with data in incorrect format*/
         YES_NO, 
-        //* Year of date in CSV file
+        /** Year of date in CSV file*/
         YEAR, 
-        //* User is inputing their username
+        /** User is inputing their username*/
         USERNAME, 
-        //* User is inputing their password
+        /** User is inputing their password*/
         PASSWORD, 
-        //* All other inputs
+        /** All other inputs*/
         TEXT
     }
 
