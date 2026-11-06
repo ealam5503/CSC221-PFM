@@ -12,6 +12,15 @@ import java.util.Scanner;
 public class Validation {
 
     /**
+    * Empty constructor for Validation class for instantiation
+    * @author Eliott Edeki
+    */
+
+    private Validation(){
+
+    }
+
+    /**
      * Check that the date in CSV file has correct format
      * and all dates are from the same year.
      *
@@ -20,10 +29,20 @@ public class Validation {
      *         is incorrect or dates have different years
      * @author Eliott Edeki
      */
+    
     public static boolean dateValidate(int date) {
         return false;
     }
 
+    /**
+    * Categories allowed in CSV file
+    * @author Eliott Edeki
+    */
+    enum Categories{
+        COMPENSATION, ALLOWANCE, INVESTMENTS, INCOME_OTHER, HOME, UTILITIES, FOOD,
+        APPEARANCE, WORK, EDUCATION, TRANSPORTATION, ENTERTAINMENT, PROFESSIONAL_SERVICES,
+        EXPENSE_OTHER}
+    
     /**
      * Check that category in CSV file is from the specified terms.
      *
@@ -31,6 +50,7 @@ public class Validation {
      * @return true if category is from approved terms, false otherwise
      * @author Eliott Edeki
      */
+   
     public static boolean categoryValidate(String category) {
         return false;
     }
