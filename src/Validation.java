@@ -39,8 +39,33 @@ public class Validation {
     * @author Eliott Edeki
     */
     enum Categories{
-        COMPENSATION, ALLOWANCE, INVESTMENTS, INCOME_OTHER, HOME, UTILITIES, FOOD,
-        APPEARANCE, WORK, EDUCATION, TRANSPORTATION, ENTERTAINMENT, PROFESSIONAL_SERVICES,
+        //* Income: Net pay after deductions
+        COMPENSATION, 
+        //* Income: Contributions from others
+        ALLOWANCE, 
+        //* Income: Unearned income after taxes
+        INVESTMENTS,
+        //* Income: Any other income
+        INCOME_OTHER,
+        //* Expense: Expenses related to housing
+        HOME, 
+        //* Expense: Energy and internet for home
+        UTILITIES, 
+        //* Expense: Non-entertainment spending on food
+        FOOD,
+        //* Expense: Clothing, cosmetics
+        APPEARANCE, 
+        //* Expense: Unreimbursed work-related purchases
+        WORK, 
+        //* Expense: School tuition, tutors or supplies
+        EDUCATION, 
+        //* Expense: Costs of transit fares or personal vehicle use
+        TRANSPORTATION,
+        //* Expense: Non-essential purchases for entertainment such as vacations or gifts
+        ENTERTAINMENT, 
+        //* Expense: Fees from professionals such as lawyers or doctors
+        PROFESSIONAL_SERVICES,
+        //* Expense: Other expenses not previously mentioned
         EXPENSE_OTHER}
     
     /**
