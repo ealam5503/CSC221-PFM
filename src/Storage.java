@@ -97,3 +97,4 @@ public class Storage {
     private Budget loadBudgetFromFile(int year) throws IOException {
         return null;
     }
+}
