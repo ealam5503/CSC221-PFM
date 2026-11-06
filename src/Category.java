@@ -1,5 +1,7 @@
 /**
  * Income and expense categories.
+ *
+ * @author Tawseef Jadid
  */
 public enum Category {
     /** Income: net pay after taxes and other deductions. */
