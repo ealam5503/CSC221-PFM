@@ -91,6 +91,7 @@ public class Validation {
         return false;
     }
 
+    
     /**
      * Kinds of console entries checked by inputValidate().
      *
@@ -100,7 +101,17 @@ public class Validation {
         MENU_CHOICE, YES_NO, YEAR, USERNAME, PASSWORD, TEXT
     }
 
+    
+    /**
+    * Minimum year allowed in date entry in CSV file
+    * @author Yugin Belbase
+    */
     public static final int MIN_YEAR = 1900;
+
+    /**
+    * Minimum length of password for account
+    * @author Yugin Belbase
+    */
     public static final int MIN_PASSWORD_LENGTH = 8;
 
     /**
