@@ -52,7 +52,7 @@ public class Storage {
      * @param year the year of the budget to return
      * @return the budget object for that year or null if there is none
      * @throws IOException if the saved data exists but cannot be read
-     * @Juan Balbuena
+     * @author Juan Balbuena
      */
     public Budget getBudget(int year) throws IOException {
         return null;
