@@ -1,4 +1,5 @@
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,21 +15,10 @@ import java.util.Set;
  * @author Genesis Vejar
  */
 public class DataAudit {
+	
 
 	/** Categories the audit skips; empty means everything is checked. */
 	private final Set<String> excludedCategories = new HashSet<>();
-
-	/**
-	 * One transaction from a loaded year. Placeholder input type until the Storage
-	 * team's budget object is known.
-	 *
-	 * @param date     the transaction date
-	 * @param category the category name
-	 * @param amount   the whole-dollar amount; income positive, expenses negative
-	 * @author Andrew Zuniga
-	 */
-	public record Entry(LocalDate date, String category, int amount) {
-	}
 
 	/**
 	 * Creates an auditor with no excluded categories. DataAudit holds the state of
@@ -55,7 +45,7 @@ public class DataAudit {
 	 * @throws IllegalArgumentException if {@code entries} is null
 	 * @author Andrew Zuniga
 	 */
-	public String runAudit(List<Entry> entries) {
+	public String runAudit(List<Transaction> entries) {
 		// TODO: combine findDuplicates and findAnomalies results, formatReport and
 		// return formatted string.
 		return "";
@@ -71,7 +61,7 @@ public class DataAudit {
 	 * @return list of findings, one per duplicated entry
 	 * @author Genesis Vejar
 	 */
-	private List<AuditFinding> findDuplicates(List<Entry> entries) {
+	private List<AuditFinding> findDuplicates(List<Transaction> entries) {
 		// TODO: group by (date, category, amount) and flag groups larger than one
 		return List.of();
 	}
@@ -87,7 +77,7 @@ public class DataAudit {
 	 * @return list of findings, one per anomalous entry
 	 * @author Bobby Lu
 	 */
-	private List<AuditFinding> findAnomalies(List<Entry> entries) {
+	private List<AuditFinding> findAnomalies(List<Transactionw> entries) {
 		// TODO: compute a typical monthly amount per category and flag outliers
 		return List.of();
 	}
@@ -135,7 +125,18 @@ public class DataAudit {
 	 * @author Andrew Zuniga
 	 */
 	private String formatReport(List<AuditFinding> findings) {
-		// TODO: build the report string
-		return "";
+		StringBuilder report = new StringBuilder();
+		report.append(String.format("%-16s | %-21s | %-18s | %-9s | %s%n", "Date", "Category", "Amount", "Type", "Reason")); //Header for report
+		
+		report.append("-".repeat(120)).append(System.lineSeparator()); // Divider for report.
+		List<AuditFinding> sorted = new ArrayList<>(findings); // Sort all findings.
+		sorted.sort(Comparator.comparing(AuditFinding::category) //First by category.
+				.thenComparing(AuditFinding::auditType) //Second by the audit finding type.
+				.thenComparing(AuditFinding::date)); //Third by the date.
+		for (AuditFinding entry : sorted) {
+			report.append(String.format("%-16s | %-21s | $ %16d | %9s | %s%n",
+					entry.date(), entry.category(), entry.amount(), entry.auditType(), entry.reason()));
+		}
+		return report.toString();
 	}
 }

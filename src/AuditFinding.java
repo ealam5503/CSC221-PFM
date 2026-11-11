@@ -1,5 +1,3 @@
-import java.time.LocalDate;
-
 /**
  * One transaction flagged by the audit, together with the reason it was flagged.
  * Instances are immutable.
@@ -13,7 +11,7 @@ import java.time.LocalDate;
  * @author Andrew Zuniga
  */
 public record AuditFinding(
-        LocalDate date,
+        String date,
         String category,
         int amount,
         FindingType auditType,
