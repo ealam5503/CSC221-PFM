@@ -93,12 +93,7 @@ public void calculateCategoryTotals() {
 }
 
 
-/**
- * Prints the annual financial report
- * in the console.
- *
- * @author Shuvo Barmon
- */
+
 public void printConsoleReport() {
 
     String[] months = {
