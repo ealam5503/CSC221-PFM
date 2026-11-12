@@ -1,6 +1,8 @@
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -14,8 +16,8 @@ import java.util.Set;
  * @author Bobby Lu
  * @author Genesis Vejar
  */
+
 public class DataAudit {
-	
 
 	/** Categories the audit skips; empty means everything is checked. */
 	private final Set<String> excludedCategories = new HashSet<>();
@@ -62,8 +64,53 @@ public class DataAudit {
 	 * @author Genesis Vejar
 	 */
 	private List<AuditFinding> findDuplicates(List<Transaction> entries) {
-		// TODO: group by (date, category, amount) and flag groups larger than one
-		return List.of();
+
+		if (entries == null) { // If a null list is passed, throw an exception.
+			throw new IllegalArgumentException("Entries can't be null");
+
+		}
+		
+		//Holds an AuditFinding for each duplicate.
+		List<AuditFinding> resultsAuditFindings = new ArrayList<>();
+
+		
+		for (int i = 0; i < entries.size(); i++) {
+
+			Transaction currentTransaction = entries.get(i);
+			
+			//Convert Category enum to a String, as excludedCategories and AuditFinding
+			//use Strings.
+			String categoryString = currentTransaction.category().name();
+			
+			//If a category is excluded from the audit, skip it.
+			if (excludedCategories.contains(categoryString)) {
+				continue;
+			}
+
+			for (int j = 0; j < i; j++) {
+				
+				//Check if two transactions are equal (same date, category and amount).
+				if (entries.get(j).equals(currentTransaction)) {
+					
+					//Build a finding that describes this duplicate.
+					AuditFinding findings = new AuditFinding(
+							currentTransaction.date(), 
+							categoryString,
+							currentTransaction.amount(), 
+							FindingType.DUPLICATE,
+							"Same date, category and amount as a previous entry");
+					
+					//Add the finding to the results list
+					//Stop looking back, so the transaction is flagged once.
+					resultsAuditFindings.add(findings);
+					break;
+				}
+
+			}
+		}
+		
+		//Return every duplicate found.
+		return resultsAuditFindings;
 	}
 
 	/**
@@ -114,9 +161,9 @@ public class DataAudit {
 	}
 
 	/**
-	 * Turns findings into a formatted report text ready for the shared menu to display. Findings
-	 * should be grouped sensibly (for example income and expense), and an empty
-	 * list should produce a clear "no issues found" message.
+	 * Turns findings into a formatted report text ready for the shared menu to
+	 * display. Findings should be grouped sensibly (for example income and
+	 * expense), and an empty list should produce a clear "no issues found" message.
 	 *
 	 * @param findings the combined results of {@link #findDuplicates(List)} and
 	 *                 {@link #findAnomalies(List)}; must not be null
@@ -126,16 +173,19 @@ public class DataAudit {
 	 */
 	private String formatReport(List<AuditFinding> findings) {
 		StringBuilder report = new StringBuilder();
-		report.append(String.format("%-16s | %-21s | %-18s | %-9s | %s%n", "Date", "Category", "Amount", "Type", "Reason")); //Header for report
-		
+		report.append(
+				String.format("%-16s | %-21s | %-18s | %-9s | %s%n", "Date", "Category", "Amount", "Type", "Reason")); // Header
+																														// for
+																														// report
+
 		report.append("-".repeat(120)).append(System.lineSeparator()); // Divider for report.
 		List<AuditFinding> sorted = new ArrayList<>(findings); // Sort all findings.
-		sorted.sort(Comparator.comparing(AuditFinding::category) //First by category.
-				.thenComparing(AuditFinding::auditType) //Second by the audit finding type.
-				.thenComparing(AuditFinding::date)); //Third by the date.
+		sorted.sort(Comparator.comparing(AuditFinding::category) // First by category.
+				.thenComparing(AuditFinding::auditType) // Second by the audit finding type.
+				.thenComparing(AuditFinding::date)); // Third by the date.
 		for (AuditFinding entry : sorted) {
-			report.append(String.format("%-16s | %-21s | $ %16d | %9s | %s%n",
-					entry.date(), entry.category(), entry.amount(), entry.auditType(), entry.reason()));
+			report.append(String.format("%-16s | %-21s | $ %16d | %9s | %s%n", entry.date(), entry.category(),
+					entry.amount(), entry.auditType(), entry.reason()));
 		}
 		return report.toString();
 	}
