@@ -124,7 +124,7 @@ public class DataAudit {
 	 * @return list of findings, one per anomalous entry
 	 * @author Bobby Lu
 	 */
-	private List<AuditFinding> findAnomalies(List<Transactionw> entries) {
+	private List<AuditFinding> findAnomalies(List<Transaction> entries) {
 		// TODO: compute a typical monthly amount per category and flag outliers
 		return List.of();
 	}
@@ -137,7 +137,15 @@ public class DataAudit {
 	 * @author Minghao Dong
 	 */
 	public void setExcludedCategories(Set<String> categories) {
-		// TODO: store a defensive copy
+		if (categories == null) {
+		    throw new IllegalArgumentException("categories cannot be null");
+		}
+		
+		Set<String> copy = new HashSet<>(categories);
+		
+		excludedCategories.clear();
+
+	    excludedCategories.addAll(copy);
 	}
 
 	/**
@@ -147,8 +155,7 @@ public class DataAudit {
 	 * @author Minghao Dong
 	 */
 	public Set<String> getExcludedCategories() {
-		// TODO: return an unmodifiable view
-		return Set.of();
+		return Set.copyOf(excludedCategories);
 	}
 
 	/**
@@ -157,7 +164,7 @@ public class DataAudit {
 	 * @author Minghao Dong
 	 */
 	public void clearExcludedCategories() {
-		// TODO: empty the exclusion set
+		excludedCategories.clear();
 	}
 
 	/**
