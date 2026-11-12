@@ -77,6 +77,14 @@ public class Validation {
      */
    
     public static boolean categoryValidate(String category) {
+        if (value == null) {
+            return false;
+        }
+        for (Categories category : Categories.values()) {
+            if (category.name().equals(value)) {
+                return true;
+            }
+        }
         return false;
     }
 
