@@ -30,7 +30,7 @@ public class Validation {
      * @author Eliott Edeki
      */
     
-    public static boolean dateValidate(string dateStr) {
+    public static boolean dateValidate(String dateStr) {
         if (dateStr == null) {
             return false;
         }
