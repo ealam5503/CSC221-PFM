@@ -31,6 +31,52 @@ public class Validation {
      */
     
     public static boolean dateValidate(int date) {
+        if (dateStr == null) {
+            return false;
+        }
+
+        // 1. Enforce strict MM/DD/YYYY format using regex
+        String regex = "^(0[1-9]|1[0-2])/([0-2][0-9]|3[0-1])/\\d{4}$";
+        if (!dateStr.matches(regex)) {
+            return false;
+        }
+
+        // 2. Split into components
+        String[] parts = dateStr.split("/");
+        if (parts.length != 3) {
+            return false;
+        }
+
+        int month, day, year;
+        try {
+            month = Integer.parseInt(parts[0]);
+            day = Integer.parseInt(parts[1]);
+            year = Integer.parseInt(parts[2]);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        // 3. Determine maximum days for the given month and year
+        int maxDays;
+        switch (month) {
+            case 2:
+                // Leap year check: divisible by 4, but not 100 unless also divisible by 400
+                boolean isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+                maxDays = isLeapYear ? 29 : 28;
+                break;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                maxDays = 30;
+                break;
+            default:
+                maxDays = 31;
+                break;
+        }
+
+        // 4. Validate that the day fits within the month's maximum days
+        return day <= maxDays;
         return false;
     }
 
