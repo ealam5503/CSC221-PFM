@@ -12,6 +12,15 @@ import java.util.Scanner;
 public class Validation {
 
     /**
+    * Empty constructor for Validation class for instantiation
+    * @author Eliott Edeki
+    */
+
+    private Validation(){
+
+    }
+
+    /**
      * Check that the date in CSV file has correct format
      * and all dates are from the same year.
      *
@@ -20,10 +29,45 @@ public class Validation {
      *         is incorrect or dates have different years
      * @author Eliott Edeki
      */
+    
     public static boolean dateValidate(int date) {
         return false;
     }
 
+    /**
+    * Categories allowed in CSV file
+    * @author Eliott Edeki
+    */
+    enum Categories{
+        //* Income: Net pay after deductions
+        COMPENSATION, 
+        //* Income: Contributions from others
+        ALLOWANCE, 
+        //* Income: Unearned income after taxes
+        INVESTMENTS,
+        //* Income: Any other income
+        INCOME_OTHER,
+        //* Expense: Expenses related to housing
+        HOME, 
+        //* Expense: Energy and internet for home
+        UTILITIES, 
+        //* Expense: Non-entertainment spending on food
+        FOOD,
+        //* Expense: Clothing, cosmetics
+        APPEARANCE, 
+        //* Expense: Unreimbursed work-related purchases
+        WORK, 
+        //* Expense: School tuition, tutors or supplies
+        EDUCATION, 
+        //* Expense: Costs of transit fares or personal vehicle use
+        TRANSPORTATION,
+        //* Expense: Non-essential purchases for entertainment such as vacations or gifts
+        ENTERTAINMENT, 
+        //* Expense: Fees from professionals such as lawyers or doctors
+        PROFESSIONAL_SERVICES,
+        //* Expense: Other expenses not previously mentioned
+        EXPENSE_OTHER}
+    
     /**
      * Check that category in CSV file is from the specified terms.
      *
@@ -31,6 +75,7 @@ public class Validation {
      * @return true if category is from approved terms, false otherwise
      * @author Eliott Edeki
      */
+   
     public static boolean categoryValidate(String category) {
         return false;
     }
@@ -71,16 +116,38 @@ public class Validation {
         return false;
     }
 
+    
     /**
      * Kinds of console entries checked by inputValidate().
      *
      * @author Yugin Belbase
      */
     public enum InputType {
-        MENU_CHOICE, YES_NO, YEAR, USERNAME, PASSWORD, TEXT
+        //* User is navigating the menu
+        MENU_CHOICE, 
+        //* User is choosing if they want to display CSV file with data in incorrect format
+        YES_NO, 
+        //* Year of date in CSV file
+        YEAR, 
+        //* User is inputing their username
+        USERNAME, 
+        //* User is inputing their password
+        PASSWORD, 
+        //* All other inputs
+        TEXT
     }
 
+    
+    /**
+    * Minimum year allowed in date entry in CSV file
+    * @author Yugin Belbase
+    */
     public static final int MIN_YEAR = 1900;
+
+    /**
+    * Minimum length of password for account
+    * @author Yugin Belbase
+    */
     public static final int MIN_PASSWORD_LENGTH = 8;
 
     /**
