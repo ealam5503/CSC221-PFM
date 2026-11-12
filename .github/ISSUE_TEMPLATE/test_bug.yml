@@ -1,7 +1,7 @@
 name: Test Team Bug Report
 description: File a bug report for the Test Team tracking system.
 title: "[Bug]: "
-labels: ["status: open", "type: bug"]
+labels: ["status: open", "bug"]
 body:
   - type: markdown
     attributes:
