@@ -1,0 +1,35 @@
+name: Test Team Bug Report
+description: |
+  File a bug report for the Test Team tracking system.
+  **Required elements for each bug:** Status, Issue ID, Synopsis, Details, Creator, Solution (when closed), and Assigned To.
+title: "[Bug]: "
+labels: ["status: open", "type: bug"]
+body:
+  - type: input
+    id: synopsis
+    attributes:
+      label: Synopsis
+      description: A brief summary of the bug.
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Steps to reproduce, expected result, and actual result.
+    validations:
+      required: true
+  - type: input
+    id: assigned
+    attributes:
+      label: Assigned To
+      description: Which developer is currently responsible?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution (When Closed)
+      description: Developer must fill this before closing the issue.
+    validations:
+      required: false
