@@ -7,6 +7,11 @@
  * @author Marlin Canelo
  * @author Colin Russell
  */
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Locale;
+
 public class Reports {
 
     /**
@@ -38,15 +43,119 @@ public class Reports {
      */
     public void exportReportToCSV() {
         // TODO: Implement file export logic
-    }
+        String[] months = { "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    };
+        double[] monthlyIncome = new double[12];
+        double[] monthlyExpenses = new double[12]; 
 
+        //Calculate monthly income and expenses 
+        for (int i = 0; i < transactions.size(); i++) {
+
+        Transaction t = transactions.get(i);
+
+        int index = t.getMonth() - 1;
+        double amount = t.getAmount();
+
+        if (index < 0 || index >= 12) {
+            continue;
+        }
+        if (amount > 0) {
+            monthlyIncome[index] += amount;
+        } else if (amount < 0) {
+            monthlyExpenses[index] -= amount;
+        } 
+    } 
+        //Calculate category totals using Shuvo's method
+        calculateCategoryTotals();
+
+        double totalIncome = 0;
+        double totalExpenses = 0;
+
+    try (PrintWriter writer = new PrintWriter(new FileWriter("annual_report.csv"))) {
+
+        // Monthly summary
+        writer.println("Month,Income,Expenses,Balance");
+
+        for (int i = 0; i < 12; i++) {
+
+            double balance =
+                monthlyIncome[i] - monthlyExpenses[i];
+
+            writer.printf(Locale.US, "%s,%.2f,%.2f,%.2f%n",
+                months[i],
+                monthlyIncome[i],
+                monthlyExpenses[i],
+                balance);
+
+            totalIncome += monthlyIncome[i];
+            totalExpenses += monthlyExpenses[i];
+        }
+        writer.println();
+        writer.println("INCOME BY CATEGORY");
+        writer.println("Category,Total");
+
+        for (int i = 0; i < incomeCategories.length; i++) {
+            writer.printf(Locale.US, "\"%s\",%.2f%n",
+                incomeCategories[i].replace("\"", "\"\""),
+                incomeTotals[i]);
+        }
+
+        // Expense categories
+        writer.println();
+        writer.println("EXPENSES BY CATEGORY");
+        writer.println("Category,Total");
+
+        for (int i = 0; i < expenseCategories.length; i++) {
+            writer.printf(Locale.US, "\"%s\",%.2f%n",
+                expenseCategories[i].replace("\"", "\"\""),
+                expenseTotals[i]);
+        }
+
+        // Yearly summary
+        double yearlyBalance = totalIncome - totalExpenses;
+
+        writer.println();
+        writer.println("YEARLY SUMMARY");
+        writer.println("Metric,Value");
+
+        writer.printf(Locale.US,
+            "Total Income,%.2f%n", totalIncome);
+
+        writer.printf(Locale.US,
+            "Total Expenses,%.2f%n", totalExpenses);
+
+        writer.printf(Locale.US,
+            "Yearly Balance,%.2f%n", yearlyBalance);
+
+        if (yearlyBalance > 0) {
+            writer.println("Status,Surplus");
+        } else if (yearlyBalance < 0) {
+            writer.println("Status,Deficit");
+        } else {
+            writer.println("Status,Balanced");
+        }
+
+        System.out.println(
+            "Annual report exported to annual_report.csv");
+    }
+    catch (IOException e) {
+        System.out.println(
+            "Error exporting report: " + e.getMessage());
+    }
+}
+
+//  ---------------------------------------------------------------------
+        
+            
     /**
      * Calculates expenditure totals aggregated by financial category.
      * 
      * @author Marlin Canelo
      */
-    ------------------------------------------------------------------
-    (//Shuvo's code below)
+   // ------------------------------------------------------------------
+    //(Shuvo's code below)
 public void calculateCategoryTotals() {
 
     // Reset income totals
