@@ -1,8 +1,10 @@
-package pfm.accounts; //allows to not have name conflict potentially
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * takes care of user accounts for the PFM: creating an account, signing in,
@@ -193,9 +195,20 @@ public class Accounts {
      * @author Ousseynou Diop
      * @author Wasif Ahmed
      */
-    public static String hashPassword(String plainText, String salt) {
-        // TODO: Implement hashPassword.
-        throw new UnsupportedOperationException("Not implemented yet");
+    public static String hashPassword(String plainText, String salt) 
+    {
+        try 
+        {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            String combined = plainText + salt;
+            byte[] hashBytes = digest.digest(combined.getBytes(StandardCharsets.UTF_8));
+        
+            return Base64.getEncoder().encodeToString(hashBytes);
+        } 
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new IllegalStateException("Error: SHA-256 may not be available");
+        }
     }
 
     /**
