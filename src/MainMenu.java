@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 /**
  * Provides the shared console menu for an authenticated user.
  * Coordinates menu actions with the other teams' modules.
@@ -5,6 +9,9 @@
  * @author Sam Strugger
  */
 public class MainMenu {
+    private final Scanner scanner = new Scanner(System.in);
+    private List<Integer> budgetYears = new ArrayList<>();
+
     /**
      * Creates the main menu.
      *
@@ -20,7 +27,16 @@ public class MainMenu {
      * @author Sam Strugger
      */
     public void displayMenu() {
-        throw new UnsupportedOperationException("Menu display is not implemented yet.");
+        System.out.println();
+        System.out.println("Personal Finance Manager");
+        System.out.println("-----------------------");
+        System.out.println("1. Upload annual data");
+        System.out.println("2. Delete annual data");
+        System.out.println("3. Generate annual report");
+        System.out.println("4. Audit annual data");
+        System.out.println("5. Sign out");
+        System.out.println();
+        System.out.print("Enter your selection: ");
     }
 
     /**
@@ -30,7 +46,41 @@ public class MainMenu {
      * @author Sam Strugger
      */
     public void handleMenuSelection() {
-        throw new UnsupportedOperationException("Menu selection is not implemented yet.");
+        while (true) {
+            displayMenu();
+
+            if (!scanner.hasNextLine()) {
+                return;
+            }
+
+            int selection;
+            try {
+                selection = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.err.println("Please enter a number between 1 and 5.");
+                continue;
+            }
+
+            switch (selection) {
+                case 1:
+                    uploadAnnualData();
+                    return;
+                case 2:
+                    deleteAnnualData();
+                    return;
+                case 3:
+                    generateAnnualReport();
+                    return;
+                case 4:
+                    auditAnnualData();
+                    return;
+                case 5:
+                    signOut();
+                    return;
+                default:
+                    System.err.println("Please enter a number between 1 and 5.");
+            }
+        }
     }
 
     /**
@@ -41,7 +91,39 @@ public class MainMenu {
      * @author Sam Strugger
      */
     public int selectYear() {
-        throw new UnsupportedOperationException("Year selection is not implemented yet.");
+        if (budgetYears.isEmpty()) {
+            throw new IllegalStateException("No stored budget years are available.");
+        }
+
+        System.out.println();
+        System.out.println("Stored budget years");
+        System.out.println("-------------------");
+        for (int i = 0; i < budgetYears.size(); i++) {
+            System.out.println((i + 1) + ". " + budgetYears.get(i));
+        }
+
+        while (true) {
+            System.out.print("Select a year (1-" + budgetYears.size() + "): ");
+
+            if (!scanner.hasNextLine()) {
+                throw new IllegalStateException("Console input ended before a year was selected.");
+            }
+
+            int selection;
+            try {
+                selection = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.err.println("Please enter a number between 1 and " + budgetYears.size() + ".");
+                continue;
+            }
+
+            if (selection < 1 || selection > budgetYears.size()) {
+                System.err.println("Please enter a number between 1 and " + budgetYears.size() + ".");
+                continue;
+            }
+
+            return budgetYears.get(selection - 1);
+        }
     }
 
     /**
