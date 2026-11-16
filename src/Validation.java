@@ -142,7 +142,7 @@ public class Validation {
      * @return true if integer, otherwise false
      * @author Eliott Edeki
      */
-    public static boolean amountValidate(string amount) {
+    public static boolean amountValidate(String amount) {
         if(amount == null || amount.isEmpty()){
             return false;
         }
