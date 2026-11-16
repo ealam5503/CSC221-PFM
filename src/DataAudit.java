@@ -22,7 +22,7 @@ import java.util.Set;
 public class DataAudit {
 
 	/** Categories the audit skips; empty means everything is checked. */
-	private final static Set<Category> excludedCategories = new HashSet<>();
+	private final Set<Category> excludedCategories = new HashSet<>();
 
 	/**
 	 * Creates an auditor with no excluded categories. DataAudit holds the state of
@@ -57,8 +57,8 @@ public class DataAudit {
 
 		}
 		List<AuditFinding> fullAudit = new ArrayList<>();
-		fullAudit.addAll(DataAudit.findAnomalies(entries));
-		fullAudit.addAll(DataAudit.findDuplicates(entries));
+		fullAudit.addAll(findAnomalies(entries));
+		fullAudit.addAll(findDuplicates(entries));
 		if (fullAudit.size()==0)
 			return "Data Audit found no anomolous or duplicate entries.";
 		return DataAudit.formatReport(fullAudit);
@@ -74,7 +74,7 @@ public class DataAudit {
 	 * @return list of findings, one per duplicated entry
 	 * @author Genesis Vejar
 	 */
-	private static List<AuditFinding> findDuplicates(List<Transaction> entries) {
+	private List<AuditFinding> findDuplicates(List<Transaction> entries) {
 
 		if (entries == null) { // If a null list is passed, throw an exception.
 			throw new IllegalArgumentException("Entries can't be null");
@@ -131,7 +131,7 @@ public class DataAudit {
 	 * @return list of findings, one per anomalous entry
 	 * @author Bobby Lu
 	 */
-	private static List<AuditFinding> findAnomalies(List<Transaction> entries) {
+	private List<AuditFinding> findAnomalies(List<Transaction> entries) {
 		// TODO: compute a typical monthly amount per category and flag outliers
 
 		if (entries == null)
