@@ -1,3 +1,4 @@
+package pfm.accounts; //prevents name conflicts
 /**
  * Holds the saved information for one user account. The password and
  * secret answer are stored only as hashes, never as plain text.
