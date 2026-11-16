@@ -1,4 +1,3 @@
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,7 +22,7 @@ import java.util.Set;
 public class DataAudit {
 
 	/** Categories the audit skips; empty means everything is checked. */
-	private final Set<String> excludedCategories = new HashSet<>();
+	private final static Set<Category> excludedCategories = new HashSet<>();
 
 	/**
 	 * Creates an auditor with no excluded categories. DataAudit holds the state of
@@ -53,7 +52,16 @@ public class DataAudit {
 	public String runAudit(List<Transaction> entries) {
 		// TODO: combine findDuplicates and findAnomalies results, formatReport and
 		// return formatted string.
-		return "";
+		if (entries == null) { // If a null list is passed, throw an exception.
+			throw new IllegalArgumentException("Entries can't be null");
+
+		}
+		List<AuditFinding> fullAudit = new ArrayList<>();
+		fullAudit.addAll(DataAudit.findAnomalies(entries));
+		fullAudit.addAll(DataAudit.findDuplicates(entries));
+		if (fullAudit.size()==0)
+			return "Data Audit found no anomolous or duplicate entries.";
+		return DataAudit.formatReport(fullAudit);
 	}
 
 	/**
@@ -66,7 +74,7 @@ public class DataAudit {
 	 * @return list of findings, one per duplicated entry
 	 * @author Genesis Vejar
 	 */
-	private List<AuditFinding> findDuplicates(List<Transaction> entries) {
+	private static List<AuditFinding> findDuplicates(List<Transaction> entries) {
 
 		if (entries == null) { // If a null list is passed, throw an exception.
 			throw new IllegalArgumentException("Entries can't be null");
@@ -81,12 +89,8 @@ public class DataAudit {
 
 			Transaction currentTransaction = entries.get(i);
 			
-			//Convert Category enum to a String, as excludedCategories and AuditFinding
-			//use Strings.
-			String categoryString = currentTransaction.category().name();
-			
 			//If a category is excluded from the audit, skip it.
-			if (excludedCategories.contains(categoryString)) {
+			if (excludedCategories.contains(currentTransaction.category())) {
 				continue;
 			}
 
@@ -98,7 +102,7 @@ public class DataAudit {
 					//Build a finding that describes this duplicate.
 					AuditFinding findings = new AuditFinding(
 							currentTransaction.date(), 
-							categoryString,
+							currentTransaction.category(),
 							currentTransaction.amount(), 
 							FindingType.DUPLICATE,
 							"Same date, category and amount as a previous entry");
@@ -127,9 +131,8 @@ public class DataAudit {
 	 * @return list of findings, one per anomalous entry
 	 * @author Bobby Lu
 	 */
-	private List<AuditFinding> findAnomalies(List<Transaction> entries) {
+	private static List<AuditFinding> findAnomalies(List<Transaction> entries) {
 		// TODO: compute a typical monthly amount per category and flag outliers
-		return List.of();
 
 		if (entries == null)
 			throw new IllegalArgumentException("Entries cannot be null");
@@ -138,13 +141,13 @@ public class DataAudit {
 
 		Map<String, Map<String, Long>> monthlyTotals = new HashMap<>();
 		for (Transaction transaction : entries) {
-			String category = transaction.category().name();
+
 			// Prevents excluded categories from contributing to monthly total
-			if (excludedCategories.contains(category))
+			if (excludedCategories.contains(transaction.category()))
 				continue;
 			String month = transaction.date().substring(0, 2);
 			boolean expense = transaction.amount() < 0;
-			String groupKey = category + (expense ? "_EXPENSE" : "_INCOME");
+			String groupKey = transaction.category() + (expense ? "_EXPENSE" : "_INCOME");
 
 			// If the inner hashMap doesn't have every category key then it creates one;
 			if (!monthlyTotals.containsKey(groupKey)) {
@@ -194,7 +197,7 @@ public class DataAudit {
 								// Record each transaction from the anomalous month.
 								AuditFinding findings = new AuditFinding(
 										transaction.date(),
-										transaction.category().name(),
+										transaction.category(),
 										transaction.amount(),
 										FindingType.ANOMALY,
 										reason
@@ -214,22 +217,20 @@ public class DataAudit {
 	}
 
 	/**
-	 * Replaces the set of categories the audit will skip.
+	 * Adds to the set of categories the audit will skip.
 	 *
-	 * @param categories the categories to exclude; an empty set means none
+	 * @param categories the categories to exclude, pass Category Enum as a varargs.
 	 * @throws IllegalArgumentException if {@code categories} is null
 	 * @author Minghao Dong
 	 */
-	public void setExcludedCategories(Set<String> categories) {
+	public void setExcludedCategories(Category... categories) {
 		if (categories == null) {
-		    throw new IllegalArgumentException("categories cannot be null");
+		    throw new IllegalArgumentException("Categories cannot be null.");
 		}
 		
-		Set<String> copy = new HashSet<>(categories);
-		
-		excludedCategories.clear();
-
-	    excludedCategories.addAll(copy);
+		for (Category n : categories)
+			excludedCategories.add(n);
+	    
 	}
 
 	/**
@@ -238,7 +239,7 @@ public class DataAudit {
 	 * @return an unmodifiable set of excluded categories, never null
 	 * @author Minghao Dong
 	 */
-	public Set<String> getExcludedCategories() {
+	public Set<Category> getExcludedCategories() {
 		return Set.copyOf(excludedCategories);
 	}
 
@@ -262,7 +263,7 @@ public class DataAudit {
 	 * @return the formatted report, never null
 	 * @author Andrew Zuniga
 	 */
-	private String formatReport(List<AuditFinding> findings) {
+	private static String formatReport(List<AuditFinding> findings) {
 		StringBuilder report = new StringBuilder();
 		report.append(
 				String.format("%-16s | %-21s | %-18s | %-9s | %s%n", "Date", "Category", "Amount", "Type", "Reason")); // Header

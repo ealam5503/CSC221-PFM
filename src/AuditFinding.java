@@ -12,7 +12,7 @@
  */
 public record AuditFinding(
         String date,
-        String category,
+        Category category,
         int amount,
         FindingType auditType,
         String reason) {
