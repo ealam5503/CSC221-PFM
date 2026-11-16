@@ -1,3 +1,4 @@
+
 /**
  * The Reports class handles generating annual financial summaries and 
  * printing requested reports to the console terminal or to a file.
@@ -33,7 +34,7 @@ public class Reports {
      * @author Mohammad Forazi
      */
     public void generateAnnualReport() {
-        // TODO: Implement report generation logic
+        
     }
 
     /**
@@ -42,7 +43,6 @@ public class Reports {
      * @author Colin Russell
      */
     public void exportReportToCSV() {
-        // TODO: Implement file export logic
         String[] months = { "January", "February", "March", "April",
         "May", "June", "July", "August",
         "September", "October", "November", "December"
@@ -295,3 +295,4 @@ public void printConsoleReport() {
 }
 
 
+}
