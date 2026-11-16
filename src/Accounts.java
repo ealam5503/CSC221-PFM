@@ -58,7 +58,7 @@ public class Accounts {
      */
     public void signOut() {
         // TODO: Implement signOut.
-        throw new UnsupportedOperationException("Not implemented yet");
+        currentUser = null;
     }
 
     /**
@@ -66,10 +66,11 @@ public class Accounts {
      *
      * @return true if a user is signed in, false otherwise
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public boolean isSignedIn() {
         // TODO: Implement isSignedIn.
-        throw new UnsupportedOperationException("Not implemented yet");
+        return currentUser != null;
     }
 
     /**
@@ -77,6 +78,7 @@ public class Accounts {
      *
      * @return the current username, or null if nobody is signed in
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public String getCurrentUserName() {
         // TODO: Implement getCurrentUserName.
@@ -94,6 +96,7 @@ public class Accounts {
      * @return true if the account was created, false if the user name is already taken
      * @author Ousseynou Diop
      * @author Wasif Ahmed
+     * @author Michael Lee
      */
     public boolean registerUser(String userName, String password, String secretQuestion, String secretAnswer) {
         // TODO: Implement registerUser.
@@ -106,6 +109,7 @@ public class Accounts {
      * @param userName      the user name to check
      * @return              true if an account with this user name exists, false otherwise
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public boolean userExists(String userName) {
         // TODO: Implement userExists.
@@ -121,6 +125,7 @@ public class Accounts {
      * @return                      true if the password was changed, false if the current
 *                                   password is wrong
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public boolean changePassword(String currentPassword, String newPassword) {
         // TODO: Implement changePassword.
@@ -137,6 +142,7 @@ public class Accounts {
      * @return             true if the password was changed, false if the user name or
      *                     answer is wrong
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public boolean changePassword(String userName, String secretAnswer, String newPassword) {
         // TODO: Implement changePassword (using secretAnswer).
@@ -150,6 +156,7 @@ public class Accounts {
      * @param userName      the user name of the account
      * @return              the secret question, or null if the user name does not exist
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public String getSecretQuestion(String userName) {
         // TODO: Implement getSecretQuestion.
