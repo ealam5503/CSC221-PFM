@@ -77,7 +77,7 @@ public class Validation {
 
         // 4. Validate that the day fits within the month's maximum days
         return day <= maxDays;
-        return false;
+
     }
 
     /**
