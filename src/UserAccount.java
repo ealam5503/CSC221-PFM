@@ -17,10 +17,11 @@ public record UserAccount(String userName, String salt, String passwordHash, Str
      *
      * @return the account as CSV (one comma-separated) line
      * @author Ousseynou Diop
+     * @author Wasif Ahmed
      */
-    public String toCsvLine() {
-        // implementition part
-        throw new UnsupportedOperationException("Not implemented yet");
+    public String toCsvLine() 
+    {
+        return userName + "," + salt + "," + passwordHash + "," + secretQuestion + "," + secretAnswerHash;
     }
 
     /**

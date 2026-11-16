@@ -6,6 +6,13 @@ import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+
 /**
  * takes care of user accounts for the PFM: creating an account, signing in,
  * signing out, changing a password, and deleting an account.
@@ -107,9 +114,19 @@ public class Accounts {
      * @author Wasif Ahmed
      * @author Michael Lee
      */
-    public boolean registerUser(String userName, String password, String secretQuestion, String secretAnswer) {
-        // TODO: Implement registerUser.
-        throw new UnsupportedOperationException("Not implemented yet");
+    public boolean registerUser(String userName, String password, String secretQuestion, String secretAnswer) 
+    {
+        if (userExists(userName)) return false;
+
+        String salt = generateSalt(); 
+        String passwordHash = hashPassword(password, salt);
+        String secretHash = hashPassword(secretAnswer.trim().toLowerCase(), salt);
+
+        UserAccount account = new UserAccount(userName, salt, passwordHash, secretQuestion, secretHash);
+        users.put(userName, account);
+
+        saveUsers();
+        return true;
     }
 
     /**
@@ -242,9 +259,22 @@ public class Accounts {
      * Saves all accounts to the users file.
      *
      * @author Ousseynou Diop
+     * @author Wasif Ahmed
      */
-    private void saveUsers() {
-        // TODO: Implement saveUsers.
-        throw new UnsupportedOperationException("Not implemented yet");
+    private void saveUsers() 
+    {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(usersFilePath)))
+        {
+            for (UserAccount account : users.values())
+            {
+                writer.write(account.toCsvLine());
+                writer.newLine();
+            }
+
+        } 
+        catch (IOException e) 
+        {
+            throw new UncheckedIOException("Error: Could not save users file", e);
+        }
     }
 }
