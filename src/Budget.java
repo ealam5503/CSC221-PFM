@@ -1,13 +1,16 @@
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Holds the income and expense transactions for a single year.
  * @author Tawseef Jadid
- * @author Richard Medina
  * @author Juan Balbuena
  */
 public class Budget {
-
+	
+	private final int year;
+	private final List<Transaction> transactions;
+	
     /**
      * Creates an empty budget for the given year.
      *
@@ -15,16 +18,18 @@ public class Budget {
      * @author Tawseef Jadid
      */
     public Budget(int year) {
+    	this.year = year;
+    	this.transactions = new ArrayList<>();
     }
 
     /**
      * Gets the year this budget covers.
      *
      * @return the year
-     * @author Juan Balbuena
+     * @author Tawseef Jadid
      */
     public int getYear() {
-        return 0;
+        return year;
     }
 
     /**
@@ -33,16 +38,17 @@ public class Budget {
      * @param date the date (MM/DD/YYYY) of the transaction
      * @param category the category of the transaction
      * @param amount the dollar amount of the transaction
-     * @author Richard Medina
+     * @author Tawseef Jadid
      */
     public void addTransaction(String date, Category category, int amount) {
+    	transactions.add(new Transaction(date, category, amount));
     }
 
     /**
      * Gets every transaction in this budget.
      *
      * @return a copy of the list of all transactions
-     * @author Tawseef Jadid
+     * @author Juan Balbuena 
      */
     public List<Transaction> getAllTransactions() {
         return null;
@@ -53,7 +59,7 @@ public class Budget {
      *
      * @param category the category to look for
      * @return a copy of the list of matching transactions (empty if none)
-     * @author Richard Medina
+     * @author Juan Balbuena
      */
     public List<Transaction> getTransactions(Category category) {
         return null;
