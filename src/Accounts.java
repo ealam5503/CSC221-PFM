@@ -1,7 +1,11 @@
+package pfm.accounts; //allows to not have name conflict potentially
+import java.security.SecureRandom;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Base64;
 
 /**
- * Handles user accounts for the PFM: creating an account, signing in,
+ * takes care of user accounts for the PFM: creating an account, signing in,
  * signing out, changing a password, and deleting an account.
  *
  * Passwords and secret answers are never saved as plain text. They are
@@ -9,6 +13,7 @@ import java.util.Map;
  * users.csv so they are still there next time the program runs.
  *
  * @author Ousseynou Diop
+ * @author Michael Lee
  */
 public class Accounts {
 
@@ -25,16 +30,17 @@ public class Accounts {
     private UserAccount currentUser;
 
     /**
-     * Creates the Accounts module and loads all saved accounts from the
-     * users file. If the file does not exist yet, it starts with no accounts.
+     * Creates the Accounts module with an empty account collection and 
+     * loads saved accounts will be implemented later.
      *
      * @param usersFilePath where the users file is located
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public Accounts(String usersFilePath) {
-        // implementation for loading the accounts from the file.
+        // starts with an empty account collection until the file loading is properly implemented
         this.usersFilePath = usersFilePath;
-        this.users = null;
+        this.users = new HashMap<>(); //creates empty account collection for now
     }
 
     /**
@@ -57,7 +63,6 @@ public class Accounts {
      * @author Ousseynou Diop
      */
     public void signOut() {
-        // TODO: Implement signOut.
         currentUser = null;
     }
 
@@ -69,7 +74,6 @@ public class Accounts {
      * @author Michael Lee
      */
     public boolean isSignedIn() {
-        // TODO: Implement isSignedIn.
         return currentUser != null;
     }
 
@@ -81,8 +85,11 @@ public class Accounts {
      * @author Michael Lee
      */
     public String getCurrentUserName() {
-        // TODO: Implement getCurrentUserName.
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (currentUser == null) {
+            return null;
+        }
+
+        return currentUser.userName();
     }
 
     /**
@@ -112,8 +119,7 @@ public class Accounts {
      * @author Michael Lee
      */
     public boolean userExists(String userName) {
-        // TODO: Implement userExists.
-        throw new UnsupportedOperationException("Not implemented yet");
+        return users.containsKey(userName);
     }
 
     /**
@@ -201,8 +207,11 @@ public class Accounts {
      * @author Wasif Ahmed
      */
     private static String generateSalt() {
-        // TODO: Implement generateSalt.
-        throw new UnsupportedOperationException("Not implemented yet");
+        byte[] salt = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt); //fills the salt array with random bytes due to two accounts potentially having same passwords
+
+        return Base64.getEncoder().encodeToString(salt); //returns the bytes converted into string
     }
 
     /**
