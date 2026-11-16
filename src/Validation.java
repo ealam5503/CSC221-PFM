@@ -123,15 +123,16 @@ public class Validation {
      */
    
     public static boolean categoryValidate(String category) {
-        if (value == null) {
-            return false;
-        }
-        for (Categories category : Categories.values()) {
-            if (category.name().equals(value)) {
-                return true;
-            }
-        }
+        if (category == null) {
         return false;
+    }
+    for (Categories cat : Categories.values()) {
+        if (cat.name().equals(category)) {
+            return true;
+        }
+    }
+    
+    return false;
     }
 
     /**
@@ -141,8 +142,16 @@ public class Validation {
      * @return true if integer, otherwise false
      * @author Eliott Edeki
      */
-    public static boolean amountValidate(int amount) {
-        return false;
+    public static boolean amountValidate(string amount) {
+        if(amount == null || amount.isEmpty()){
+            return false;
+        }
+        try {
+            Integer.parseInt(amount);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /**
@@ -151,7 +160,7 @@ public class Validation {
      * @param header header of CSV file
      * @param headercount count how many headers in CSV file
      * @return true if format matches, otherwise false
-     * @author Eliott Edeki
+     * @author Amina Zaman
      */
     public static boolean headerValidate(String header, int headercount) {
         return false;
