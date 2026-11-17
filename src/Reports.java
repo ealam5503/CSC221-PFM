@@ -11,9 +11,17 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Locale;
 
 public class Reports {
+
+
+
+   private Budget budget;
+   private Category[] categories;
+   private int[] categoryTotals;
+
 
     /**
      * Constructs a new Reports instance.
@@ -23,9 +31,12 @@ public class Reports {
      * @author Marlin Canelo
      * @author Colin Russell
      */
-    public Reports() {
-        // Skeleton constructor
-    }
+      public Reports(Budget budget, Category[] categories) {
+       this.budget = budget;
+       this.categories = categories;
+       categoryTotals = new int[categories.length];
+   }
+
 
     /**
      * Generates the annual report summarizing monthly income minus expenses, 
@@ -154,52 +165,34 @@ public class Reports {
      * 
      * @author Marlin Canelo
      */
-   // ------------------------------------------------------------------
-    //(Shuvo's code below)
-public void calculateCategoryTotals() {
+   
+ public void calculateCategoryTotals() {
 
-    // Reset income totals
-    for (int i = 0; i < incomeTotals.length; i++) {
-        incomeTotals[i] = 0;
-    }
 
-    // Reset expense totals
-    for (int i = 0; i < expenseTotals.length; i++) {
-        expenseTotals[i] = 0;
-    }
+       for (int i = 0; i < categoryTotals.length; i++) {
+           categoryTotals[i] = 0 ;
+       }
 
-    // Go through all user transactions
-    for (int i = 0; i < transactions.size(); i++) {
 
-        Transaction t = transactions.get(i);
+       List<Transaction> transactions = budget.getAllTransactions();
+       for (int i = 0; i < transactions.size(); i++) {
 
-        String category = t.getCategory();
-        double amount = t.getAmount();
 
-        // Check income
-        if (amount > 0) {
+           Transaction transaction= transactions.get(i);
 
-            for (int j = 0; j < incomeCategories.length; j++) {
 
-                if (category.equals(incomeCategories[j])) {
-                    incomeTotals[j] = incomeTotals[j] + amount;
-                    break;
-                }
-            }
+           if (transaction.amount() < 0) {
 
-        // Check expenses
-        } else if (amount < 0) {
 
-            for (int j = 0; j < expenseCategories.length; j++) {
+               for (int j = 0; j < categories.length;j++) {
+                   if (transaction.category() == categories[j]) {
+                       categoryTotals[j] += transaction.amount() * -1;
+                   }
+               }
+           }
+       }
+   }
 
-                if (category.equals(expenseCategories[j])) {
-                    expenseTotals[j] = expenseTotals[j] - amount;
-                    break;
-                }
-            }
-        }
-    }
-}
 
 
 
