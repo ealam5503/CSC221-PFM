@@ -1,4 +1,5 @@
 
+import java.time.Year;
 import java.util.List;
 import java.util.Scanner;
 
@@ -214,7 +215,38 @@ public class Validation {
     public static final int MIN_PASSWORD_LENGTH = 8;
 
     /**
+    * Minimum length of username for account
+    * @author Yugin Belbase
+    */
+    private static final int MIN_USERNAME_LENGTH = 3;
+
+    /**
+    * Maximum length of username for account
+    * @author Yugin Belbase
+    */
+    private static final int MAX_USERNAME_LENGTH = 20;
+
+    /**
+    * Maximum length of any other text entry (such as a secret question or answer)
+    * @author Yugin Belbase
+    */
+    private static final int MAX_TEXT_LENGTH = 100;
+
+    /**
      * Checks that a user's console entry is valid for the expected type.
+     *
+     * Rules by type:
+     * MENU_CHOICE - a whole number from minOption to maxOption (inclusive).
+     * YES_NO      - y, yes, n, or no (any capitalization).
+     * YEAR        - exactly four digits, from MIN_YEAR to the current year.
+     * USERNAME    - 3 to 20 characters: letters, digits, or underscores,
+     *               starting with a letter.
+     * PASSWORD    - at least MIN_PASSWORD_LENGTH characters with no spaces
+     *               (passwords are checked exactly as typed, not trimmed).
+     * TEXT        - 1 to 100 characters with no commas, double quotes,
+     *               or line breaks, so it can be stored safely in a file.
+     *
+     * Leading and trailing spaces are ignored for every type except PASSWORD.
      *
      * @param input the text the user typed
      * @param type the kind of entry expected
@@ -225,7 +257,59 @@ public class Validation {
      */
     public static boolean inputValidate(String input, InputType type,
                                         int minOption, int maxOption) {
-        return false;
+        // Step 1: reject missing input or a missing type.
+        if (input == null || type == null) {
+            return false;
+        }
+
+        // Step 2: passwords are checked exactly as typed (no trimming).
+        if (type == InputType.PASSWORD) {
+            return input.length() >= MIN_PASSWORD_LENGTH
+                    && !input.matches("(?s).*\\s.*");
+        }
+
+        // Step 3: every other type ignores surrounding spaces; blank is invalid.
+        String value = input.trim();
+        if (value.isEmpty()) {
+            return false;
+        }
+
+        // Step 4: apply the rule for the requested type.
+        switch (type) {
+            case MENU_CHOICE:
+                if (minOption > maxOption || !value.matches("-?\\d{1,9}")) {
+                    return false;
+                }
+                int choice = Integer.parseInt(value);
+                return choice >= minOption && choice <= maxOption;
+
+            case YES_NO:
+                String answer = value.toLowerCase();
+                return answer.equals("y") || answer.equals("yes")
+                        || answer.equals("n") || answer.equals("no");
+
+            case YEAR:
+                if (!value.matches("\\d{4}")) {
+                    return false;
+                }
+                int year = Integer.parseInt(value);
+                return year >= MIN_YEAR && year <= Year.now().getValue();
+
+            case USERNAME:
+                return value.length() >= MIN_USERNAME_LENGTH
+                        && value.length() <= MAX_USERNAME_LENGTH
+                        && value.matches("[A-Za-z][A-Za-z0-9_]*");
+
+            case TEXT:
+                return value.length() <= MAX_TEXT_LENGTH
+                        && !value.contains(",")
+                        && !value.contains("\"")
+                        && !value.contains("\n")
+                        && !value.contains("\r");
+
+            default:
+                return false;
+        }
     }
 
     /**
@@ -251,7 +335,38 @@ public class Validation {
      * @author Yugin Belbase
      */
     public static boolean reportIssues(List<String> issues, Scanner scanner) {
-        return false;
+        // Step 1: nothing wrong means keep loading.
+        if (issues == null || issues.isEmpty()) {
+            return true;
+        }
+
+        // Step 2: show every issue as a numbered list.
+        System.out.println();
+        System.out.println("Found " + issues.size() + " problem"
+                + (issues.size() == 1 ? "" : "s") + " in the file:");
+        for (int i = 0; i < issues.size(); i++) {
+            System.out.println("  " + (i + 1) + ". " + issues.get(i));
+        }
+        System.out.println("Invalid lines will be skipped if you continue.");
+
+        // Step 3: without a scanner we can't ask, so cancel safely.
+        if (scanner == null) {
+            return false;
+        }
+
+        // Step 4: ask until the user gives a valid yes/no answer.
+        while (true) {
+            System.out.print("Ignore these lines and continue loading? (y/n): ");
+            if (!scanner.hasNextLine()) {
+                System.out.println();
+                return false;   // input ended: cancel instead of crashing
+            }
+            String answer = scanner.nextLine();
+            if (inputValidate(answer, InputType.YES_NO)) {
+                return answer.trim().toLowerCase().startsWith("y");
+            }
+            System.out.println("Please enter y or n.");
+        }
     }
 }
 
