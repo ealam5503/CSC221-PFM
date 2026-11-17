@@ -202,9 +202,61 @@ public class MainMenu {
      * report generation with the Reports module.
      *
      * @author Sam Strugger
+     * @author Asher Malik
      */
     public void generateAnnualReport() {
-        throw new UnsupportedOperationException("Annual reporting is not implemented yet.");
+        if (storage == null) {
+            System.err.println("Budget storage is not connected yet.");
+            return;
+        }
+
+        try {
+            List<Integer> storedYears = storage.getBudgetYears();
+            if (storedYears == null) {
+                System.err.println("Could not load the stored budget years.");
+                return;
+            }
+            if (storedYears.isEmpty()) {
+                System.out.println("No stored budget years are available to report.");
+                return;
+            }
+
+            budgetYears = storedYears;
+            int year = selectYear();
+
+            Budget budget = storage.getBudget(year);
+
+            if (budget == null) {
+                System.err.println("No budget data found for " + year + ".");
+                return;
+            }
+
+            System.out.println("Select report output format:");
+            System.out.println("1. Display report to console.");
+            System.out.println("2. Export report to csv file");
+            System.out.println("Enter your choice (1 or 2)");
+
+            if(!scanner.hasNextLine()){
+                return;
+            }
+
+            String choice = scanner.nextLine().trim();
+
+            Reports reportGenerator = new Reports(new ArrayList<>(budget.getAllTransactions()));
+            if(choice.equals("1")){
+                reportGenerator.generateAnnualReport();
+            }else if (choice.equals("2")){
+                reportGenerator.exportReportToCSV();
+            }else{
+                System.err.println("Invalid Selection. Canceled generating report.");
+            }
+
+        } catch (IOException e) {
+            System.err.println("Could not read the budget data: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            System.err.println(e.getMessage());
+        }
+
     }
 
     /**
