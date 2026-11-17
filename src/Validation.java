@@ -1,4 +1,3 @@
-
 import java.time.Year;
 import java.util.List;
 
@@ -85,34 +84,35 @@ public class Validation {
     * @author Eliott Edeki
     */
     public enum Categories{
-        /** Income: Net pay after deductions*/
-        COMPENSATION, 
-        /** Income: Contributions from others*/
-        ALLOWANCE, 
-        /** Income: Unearned income after taxes*/
+        /** Income: net pay after taxes and other deductions. */
+        COMPENSATION,
+        /** Income: contributions from others, including financial aid. */
+        ALLOWANCE,
+        /** Income: unearned income after taxes. */
         INVESTMENTS,
-        /** Income: Any other income*/
+        /** Income: any other income. */
         INCOME_OTHER,
-        /** Expense: Expenses related to housing*/
-        HOME, 
-        /** Expense: Energy and internet for home*/
-        UTILITIES, 
-        /** Expense: Non-entertainment spending on food*/
+        /** Expense: rent, mortgage, repairs, furniture, housewares, insurance, cleaning. */
+        HOME,
+        /** Expense: gas, electric, phone, ISP for home. */
+        UTILITIES,
+        /** Expense: groceries, non-entertainment meals. */
         FOOD,
-        /** Expense: Clothing, cosmetics*/
-        APPEARANCE, 
-        /** Expense: Unreimbursed work-related purchases*/
-        WORK, 
-        /** Expense: School tuition, tutors or supplies*/
-        EDUCATION, 
-        /** Expense: Costs of transit fares or personal vehicle use*/
+        /** Expense: clothing, grooming. */
+        APPEARANCE,
+        /** Expense: unreimbursed business expenses, uniforms, work-related services. */
+        WORK,
+        /** Expense: tuition, tutors, supplies. */
+        EDUCATION,
+        /** Expense: taxis, transit fares, personal vehicle (insurance, lease, fuel, repairs). */
         TRANSPORTATION,
-        /** Expense: Non-essential purchases for entertainment such as vacations or gifts*/
-        ENTERTAINMENT, 
-        /** Expense: Fees from professionals such as lawyers or doctors*/
+        /** Expense: subscriptions, dining out, admissions, gifts, vacations. */
+        ENTERTAINMENT,
+        /** Expense: unreimbursed medical, lawyers, consultants. */
         PROFESSIONAL_SERVICES,
-        /** Expense: Other expenses not previously mentioned*/
-        EXPENSE_OTHER}
+        /** Expense: all other expenses. */
+        EXPENSE_OTHER
+    }
     
     /**
      * Check that category in CSV file is from the specified terms.
