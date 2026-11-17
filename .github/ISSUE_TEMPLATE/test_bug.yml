@@ -1,7 +1,7 @@
-name: Test Team Bug Report
+name: Bug Report Form
 description: File a bug report for the Test Team tracking system.
 title: "[Bug]: "
-labels: ["status: open", "bug"]
+labels: ["bug"]
 body:
   - type: markdown
     attributes:
@@ -24,6 +24,13 @@ body:
       description: Steps to reproduce, expected result, and actual result.
     validations:
       required: true
+  - type: textarea
+    id: errorlogs
+    attributes:
+      label: Error logs and/or Screenshots
+      description: Provide error logs or screenshots where applicable.
+    validations:
+      required: false
   - type: input
     id: assigned
     attributes:
