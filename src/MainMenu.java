@@ -10,17 +10,22 @@ import java.util.Scanner;
  * @author Sam Strugger
  */
 public class MainMenu {
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner;
+    private final Accounts accounts;
+
     private List<Integer> budgetYears = new ArrayList<>();
     private Storage storage;
 
     /**
      * Creates the main menu.
      *
+     * @param scanner the shared console scanner
+     * @param accounts the application's Accounts module
      * @author Sam Strugger
      */
-    public MainMenu() {
-        // Dependencies will be connected when the shared module contracts are available.
+    public MainMenu(Scanner scanner, Accounts accounts) {
+        this.scanner = scanner;
+        this.accounts = accounts;
     }
 
     /**
@@ -52,6 +57,7 @@ public class MainMenu {
             displayMenu();
 
             if (!scanner.hasNextLine()) {
+                accounts.signOut();
                 return;
             }
 
@@ -298,6 +304,7 @@ public class MainMenu {
      * @author Sam Strugger
      */
     public void signOut() {
-        throw new UnsupportedOperationException("Sign-out is not implemented yet.");
+        accounts.signOut();
+        System.out.println("Signed out.");
     }
 }
