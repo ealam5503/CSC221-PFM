@@ -163,10 +163,17 @@ public class Validation {
      * @return true if format matches, otherwise false
      * @author Amina Zaman
      */
-    public static boolean headerValidate(String header, int headercount) {
+public static boolean headerValidate(String header, int headercount) {
+    if (header == null) {
         return false;
     }
 
+    if (headercount != 3) {
+        return false;
+    }
+
+    return header.equals("Date,Category,Amount");
+}
     /**
      * Checks that the CSV file has the correct format
      * and contains valid data.
@@ -176,11 +183,53 @@ public class Validation {
      * @return true if file is valid, false otherwise
      * @author Amina Zaman
      */
-    public static boolean fileValidate(List<String> lines, String filename) {
+public static boolean fileValidate(List<String> lines, String filename) {
+    if (lines == null || lines.isEmpty()) {
         return false;
     }
 
-    
+    if (filename == null || !filename.endsWith(".csv")) {
+        return false;
+    }
+
+    String header = lines.get(0);
+
+    if (header == null || !headerValidate(header, header.split(",", -1).length)) {
+        return false;
+    }
+    String year = null;
+    for (int i = 1; i < lines.size(); i++) {
+    String line = lines.get(i);
+
+    if (line == null) {
+        return false;
+    }
+
+    String[] parts = line.split(",", -1);
+
+    if (parts.length != 3) {
+        return false;
+    }
+        if (!dateValidate(parts[0])) {
+    return false;
+    }
+    String currentYear = parts[0].substring(6);
+
+    if (year == null) {
+        year = currentYear;
+    } else if (!year.equals(currentYear)) {
+        return false;
+    }
+    if (!categoryValidate(parts[1])) {
+        return false;
+    }
+
+    if (!amountValidate(parts[2])) {
+        return false;
+    }
+    }
+        return true;
+    }
     /**
      * Kinds of console entries checked by inputValidate().
      *
