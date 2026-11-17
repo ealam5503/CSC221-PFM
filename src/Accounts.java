@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -23,6 +24,7 @@ import java.nio.file.Paths;
  *
  * @author Ousseynou Diop
  * @author Michael Lee
+ * @author Wasif Ahmed
  */
 public class Accounts {
 
@@ -46,10 +48,11 @@ public class Accounts {
      * @author Ousseynou Diop
      * @author Michael Lee
      */
-    public Accounts(String usersFilePath) {
-        // starts with an empty account collection until the file loading is properly implemented
+    public Accounts(String usersFilePath) 
+    {
         this.usersFilePath = usersFilePath;
-        this.users = new HashMap<>(); //creates empty account collection for now
+        this.users = new HashMap<>(); // Creates empty account collection for now
+        this.users.putAll(loadUsers()); // Fill hashmap with loaded values from a csv
     }
 
     /**
@@ -169,11 +172,25 @@ public class Accounts {
 *                                   password is wrong
      * @author Ousseynou Diop
      * @author Michael Lee
+     * @author Wasif Ahmed
      */
-    public boolean changePassword(String currentPassword, String newPassword) {
-        // TODO: Implement changePassword.
-        throw new UnsupportedOperationException("Not implemented yet");
+    public boolean changePassword(String currentPassword, String newPassword) 
+    {
+        if (currentUser == null) return false;
+
+        String currHash = hashPassword(currentPassword, currentUser.salt());
+        if (!currHash.equals(currentUser.passwordHash())) return false;
+
+        String newHash = hashPassword(newPassword, currentUser.salt());
+        UserAccount updatedAccount = new UserAccount(currentUser.userName(), currentUser.salt(), newHash, currentUser.secretQuestion(), currentUser.secretAnswerHash());
+
+        users.put(updatedAccount.userName(), updatedAccount);
+        currentUser = updatedAccount;
+
+        saveUsers();
+        return true;
     }
+
 
     /**
      * Changes the password of a user who forgot it. The user must answer
@@ -186,10 +203,26 @@ public class Accounts {
      *                     answer is wrong
      * @author Ousseynou Diop
      * @author Michael Lee
+     * @author Wasif Ahmed
      */
-    public boolean changePassword(String userName, String secretAnswer, String newPassword) {
-        // TODO: Implement changePassword (using secretAnswer).
-        throw new UnsupportedOperationException("Not implemented yet");
+    public boolean changePassword(String userName, String secretAnswer, String newPassword) 
+    {
+        UserAccount unsignedAccount = users.get(userName);
+        if (unsignedAccount == null) return false;
+        if (currentUser != null && !currentUser.userName().equals(userName)) return false;
+
+        String currHash = hashPassword(secretAnswer.trim().toLowerCase(), unsignedAccount.salt());
+        if (!currHash.equals(unsignedAccount.secretAnswerHash())) return false;
+
+        String newHash = hashPassword(newPassword, unsignedAccount.salt());
+        UserAccount updatedAccount = new UserAccount(unsignedAccount.userName(), unsignedAccount.salt(), newHash, unsignedAccount.secretQuestion(), unsignedAccount.secretAnswerHash());
+
+        users.put(updatedAccount.userName(), updatedAccount);
+
+        if (currentUser != null) currentUser = updatedAccount;
+
+        saveUsers();
+        return true;    
     }
 
     /**
@@ -200,10 +233,14 @@ public class Accounts {
      * @return              the secret question, or null if the user name does not exist
      * @author Ousseynou Diop
      * @author Michael Lee
+     * @author Wasif Ahmed
      */
-    public String getSecretQuestion(String userName) {
-        // TODO: Implement getSecretQuestion.
-        throw new UnsupportedOperationException("Not implemented yet");
+    public String getSecretQuestion(String userName) 
+    {
+        UserAccount account = users.get(userName);
+        if (account == null) return null;
+
+        return account.secretQuestion();
     }
 
     /**
@@ -214,10 +251,20 @@ public class Accounts {
      * @param password      the user's password
      * @return              true if the account was deleted, false if the password is wrong
      * @author Ousseynou Diop
+     * @author Wasif Ahmed
      */
-    public boolean deleteUser(String password) {
-        // TODO: Implement deleteUser.
-        throw new UnsupportedOperationException("Not implemented yet");
+    public boolean deleteUser(String password) 
+    {
+        if (currentUser == null) return false;
+
+        String currHash = hashPassword(password, currentUser.salt());
+        if (!currHash.equals(currentUser.passwordHash())) return false;
+
+        users.remove(currentUser.userName());
+        saveUsers();
+        signOut();
+
+        return true;
     }
 
     /**
@@ -267,10 +314,32 @@ public class Accounts {
      *
      * @return all the saved accounts, looked up by user name
      * @author Ousseynou Diop
+     * @author Wasif Ahmed
      */
-    private Map<String, UserAccount> loadUsers() {
-        // TODO: Implement loadUsers.
-        throw new UnsupportedOperationException("Not implemented yet");
+    private Map<String, UserAccount> loadUsers() 
+    {
+        Map<String, UserAccount> loaded = new HashMap<>();
+        Path path = Paths.get(usersFilePath);
+
+        if (!Files.exists(path)) return loaded;
+
+        try (BufferedReader reader = Files.newBufferedReader(path))
+        {
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                if (line.isBlank()) continue;
+                UserAccount account = UserAccount.fromCsvLine(line);
+                loaded.put(account.userName(), account);
+            }
+
+        } 
+        catch (IOException e) 
+        {
+            throw new UncheckedIOException("Error: Could not read users file", e);
+        }
+
+        return loaded;
     }
 
     /**
