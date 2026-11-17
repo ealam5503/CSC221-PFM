@@ -1,7 +1,6 @@
 
 import java.time.Year;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Validates CSV data and user input.
@@ -299,8 +298,8 @@ public static boolean fileValidate(List<String> lines, String filename) {
      *
      * @param input the text the user typed
      * @param type the kind of entry expected
-     * @param minOption lowest valid menu number (MENU_CHOICE only)
-     * @param maxOption highest valid menu number (MENU_CHOICE only)
+     * @param minOption lowest valid menu number (MENU_CHOICE only; pass 0 for other types)
+     * @param maxOption highest valid menu number (MENU_CHOICE only; pass 0 for other types)
      * @return true if the entry is valid, false otherwise
      * @author Yugin Belbase
      */
@@ -362,31 +361,17 @@ public static boolean fileValidate(List<String> lines, String filename) {
     }
 
     /**
-     * Checks that a user's console entry is valid for any
-     * type except MENU_CHOICE.
-     *
-     * @param input the text the user typed
-     * @param type the kind of entry expected
-     * @return true if the entry is valid, false otherwise
-     * @author Yugin Belbase
-     */
-    public static boolean inputValidate(String input, InputType type) {
-        return inputValidate(input, type, 0, 0);
-    }
-
-    /**
-     * Lists any CSV issues found and asks the user to ignore
-     * them or cancel.
+     * Prints any CSV issues found and reports whether the file
+     * has data that is formatted incorrectly.
      *
      * @param issues one message per invalid line
-     * @param scanner the program's shared console scanner (not closed)
-     * @return true to continue loading, false to cancel
+     * @return true if there is at least one issue, false if there are none
      * @author Yugin Belbase
      */
-    public static boolean reportIssues(List<String> issues, Scanner scanner) {
-        // Step 1: nothing wrong means keep loading.
+    public static boolean reportIssues(List<String> issues) {
+        // Step 1: no issues means nothing is formatted incorrectly.
         if (issues == null || issues.isEmpty()) {
-            return true;
+            return false;
         }
 
         // Step 2: show every issue as a numbered list.
@@ -396,26 +381,9 @@ public static boolean fileValidate(List<String> lines, String filename) {
         for (int i = 0; i < issues.size(); i++) {
             System.out.println("  " + (i + 1) + ". " + issues.get(i));
         }
-        System.out.println("Invalid lines will be skipped if you continue.");
 
-        // Step 3: without a scanner we can't ask, so cancel safely.
-        if (scanner == null) {
-            return false;
-        }
-
-        // Step 4: ask until the user gives a valid yes/no answer.
-        while (true) {
-            System.out.print("Ignore these lines and continue loading? (y/n): ");
-            if (!scanner.hasNextLine()) {
-                System.out.println();
-                return false;   // input ended: cancel instead of crashing
-            }
-            String answer = scanner.nextLine();
-            if (inputValidate(answer, InputType.YES_NO)) {
-                return answer.trim().toLowerCase().startsWith("y");
-            }
-            System.out.println("Please enter y or n.");
-        }
+        // Step 3: at least one issue means something is formatted incorrectly.
+        return true;
     }
 }
 
