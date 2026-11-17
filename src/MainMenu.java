@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -11,6 +12,7 @@ import java.util.Scanner;
 public class MainMenu {
     private final Scanner scanner = new Scanner(System.in);
     private List<Integer> budgetYears = new ArrayList<>();
+    private Storage storage;
 
     /**
      * Creates the main menu.
@@ -166,7 +168,127 @@ public class MainMenu {
      * @author Sam Strugger
      */
     public void auditAnnualData() {
-        throw new UnsupportedOperationException("Annual data auditing is not implemented yet.");
+        if (storage == null) {
+            System.err.println("Budget storage is not connected yet.");
+            return;
+        }
+
+        try {
+            List<Integer> storedYears = storage.getBudgetYears();
+            if (storedYears == null) {
+                System.err.println("Could not load the stored budget years.");
+                return;
+            }
+            if (storedYears.isEmpty()) {
+                System.out.println("No stored budget years are available to audit.");
+                return;
+            }
+
+            budgetYears = storedYears;
+            int year = selectYear();
+            DataAudit dataAudit = new DataAudit();
+            Category[] categories = Category.values();
+
+            while (true) {
+                System.out.println();
+                System.out.println("Data audit for " + year);
+                System.out.println("-------------------");
+                System.out.print("Excluded categories: ");
+                if (dataAudit.getExcludedCategories().isEmpty()) {
+                    System.out.println("None");
+                } else {
+                    for (Category category : categories) {
+                        if (dataAudit.getExcludedCategories().contains(category)) {
+                            System.out.print(category.name().replace('_', ' ') + "; ");
+                        }
+                    }
+                    System.out.println();
+                }
+                System.out.println("1. Run audit");
+                System.out.println("2. Exclude categories");
+                System.out.println("3. Clear excluded categories");
+                System.out.println("4. Choose a different year");
+                System.out.println("5. Return to main menu");
+                System.out.print("Enter your selection: ");
+
+                if (!scanner.hasNextLine()) {
+                    return;
+                }
+
+                int selection;
+                try {
+                    selection = Integer.parseInt(scanner.nextLine().trim());
+                } catch (NumberFormatException e) {
+                    System.err.println("Please enter a number between 1 and 5.");
+                    continue;
+                }
+
+                switch (selection) {
+                    case 1:
+                        Budget budget = storage.getBudget(year);
+                        if (budget == null) {
+                            System.err.println("Could not load the budget for " + year + ".");
+                            break;
+                        }
+                        List<Transaction> entries = budget.getAllTransactions();
+                        if (entries == null) {
+                            System.err.println("Could not load the transactions for " + year + ".");
+                            break;
+                        }
+                        System.out.println(dataAudit.runAudit(entries));
+                        break;
+                    case 2:
+                        System.out.println();
+                        for (int i = 0; i < categories.length; i++) {
+                            System.out.println((i + 1) + ". " + categories[i].name().replace('_', ' '));
+                        }
+                        System.out.println("0. Return to audit menu");
+
+                        while (true) {
+                            System.out.print("Select a category to exclude (0-" + categories.length + "): ");
+                            if (!scanner.hasNextLine()) {
+                                return;
+                            }
+
+                            int categorySelection;
+                            try {
+                                categorySelection = Integer.parseInt(scanner.nextLine().trim());
+                            } catch (NumberFormatException e) {
+                                System.err.println("Please enter a number between 0 and " + categories.length + ".");
+                                continue;
+                            }
+
+                            if (categorySelection == 0) {
+                                break;
+                            }
+                            if (categorySelection < 0 || categorySelection > categories.length) {
+                                System.err.println("Please enter a number between 0 and " + categories.length + ".");
+                                continue;
+                            }
+
+                            Category category = categories[categorySelection - 1];
+                            dataAudit.setExcludedCategories(category);
+                            System.out.println("Excluded " + category.name().replace('_', ' ') + ".");
+                        }
+                        break;
+                    case 3:
+                        dataAudit.clearExcludedCategories();
+                        System.out.println("All categories will be included in the audit.");
+                        break;
+                    case 4:
+                        year = selectYear();
+                        break;
+                    case 5:
+                        return;
+                    default:
+                        System.err.println("Please enter a number between 1 and 5.");
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Could not read the budget data: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     /**
