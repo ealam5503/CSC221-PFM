@@ -13,6 +13,7 @@ public class MainMenu {
     private final Scanner scanner = new Scanner(System.in);
     private List<Integer> budgetYears = new ArrayList<>();
     private Storage storage;
+    private Accounts accounts;
 
     /**
      * Creates the main menu.
@@ -296,8 +297,16 @@ public class MainMenu {
      * authenticated menu.
      *
      * @author Sam Strugger
+     * @author Asher Malik
      */
     public void signOut() {
-        throw new UnsupportedOperationException("Sign-out is not implemented yet.");
+
+        if (accounts == null) {
+            System.err.println("Accounts module is not connected.");
+            return;
+        }
+
+        accounts.signOut();
+        System.out.println("You have been signed out successfully.");
     }
 }
