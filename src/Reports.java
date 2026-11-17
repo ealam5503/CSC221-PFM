@@ -16,8 +16,17 @@ import java.util.Locale;
 public class Reports {
 
     private ArrayList<Transaction> transactions;
-    private String[] incomeCategories = {"Salary", "Investments", "Freelance", "Other Income"};
-    private String[] expenseCategories = {"Rent", "Groceries", "Utilities", "Entertainment", "Other Expense"};
+    
+    // Official project categories from Category.java
+    private final String[] incomeCategories = {
+        "COMPENSATION", "ALLOWANCE", "INVESTMENTS", "INCOME_OTHER"
+    };
+    private final String[] expenseCategories = {
+        "HOME", "UTILITIES", "FOOD", "APPEARANCE", "WORK", 
+        "EDUCATION", "TRANSPORTATION", "ENTERTAINMENT", 
+        "PROFESSIONAL_SERVICES", "EXPENSE_OTHER"
+    };
+    
     private double[] incomeTotals = new double[incomeCategories.length];
     private double[] expenseTotals = new double[expenseCategories.length];
 
@@ -63,7 +72,7 @@ public class Reports {
             Transaction t = transactions.get(i);
 
             int index = extractMonth(t.date()) - 1;
-            double amount = t.amount(); // Fixed: using record accessor t.amount()
+            double amount = t.amount();
 
             if (index < 0 || index >= 12) {
                 continue;
@@ -75,7 +84,7 @@ public class Reports {
             } 
         } 
         
-        // Calculate category totals using Marlin/Shuvo's method
+        // Calculate category totals
         calculateCategoryTotals();
 
         double totalIncome = 0;
@@ -165,28 +174,36 @@ public class Reports {
         for (int i = 0; i < transactions.size(); i++) {
             Transaction t = transactions.get(i);
 
-            String category = t.category(); // Fixed: using record accessor t.category()
-            double amount = t.amount();     // Fixed: using record accessor t.amount()
-
-            if (category == null) {
-                category = "Other";
-            }
+            Object catObj = t.category();
+            String category = (catObj != null) ? catObj.toString() : "EXPENSE_OTHER";
+            double amount = t.amount();
 
             // Check income
             if (amount > 0) {
+                boolean matched = false;
                 for (int j = 0; j < incomeCategories.length; j++) {
-                    if (category.equals(incomeCategories[j])) {
+                    if (category.equalsIgnoreCase(incomeCategories[j])) {
                         incomeTotals[j] += amount;
+                        matched = true;
                         break;
                     }
                 }
+                if (!matched) {
+                    incomeTotals[incomeCategories.length - 1] += amount; // Fallback to INCOME_OTHER
+                }
             // Check expenses
             } else if (amount < 0) {
+                boolean matched = false;
+                double absAmount = Math.abs(amount);
                 for (int j = 0; j < expenseCategories.length; j++) {
-                    if (category.equals(expenseCategories[j])) {
-                        expenseTotals[j] -= amount; // matching group's negative subtraction logic
+                    if (category.equalsIgnoreCase(expenseCategories[j])) {
+                        expenseTotals[j] += absAmount;
+                        matched = true;
                         break;
                     }
+                }
+                if (!matched) {
+                    expenseTotals[expenseCategories.length - 1] += absAmount; // Fallback to EXPENSE_OTHER
                 }
             }
         }
@@ -212,7 +229,7 @@ public class Reports {
             Transaction t = transactions.get(i);
 
             int month = extractMonth(t.date());
-            double amount = t.amount(); // Fixed: using record accessor t.amount()
+            double amount = t.amount();
 
             int index = month - 1;
 
@@ -280,29 +297,28 @@ public class Reports {
     }
 
     /**
-     * Helper method to safely parse the month integer from a Transaction date string 
-     * (supports formats like "YYYY-MM-DD", "MM/DD/YYYY", or numeric strings).
+     * Helper method to safely parse the month integer from a Transaction date string.
      */
     private int extractMonth(String dateStr) {
         if (dateStr == null || dateStr.isEmpty()) {
-            return 1; // Default fallback month if empty
+            return 1;
         }
         try {
-            // If date is stored as "YYYY-MM-DD" or "MM/DD/YYYY"
             if (dateStr.contains("-")) {
                 String[] parts = dateStr.split("-");
                 if (parts.length >= 2) {
-                    return Integer.parseInt(parts[1]); // Assumes YYYY-MM-DD
+                    return Integer.parseInt(parts[1]);
                 }
             } else if (dateStr.contains("/")) {
                 String[] parts = dateStr.split("/");
                 if (parts.length >= 1) {
-                    return Integer.parseInt(parts[0]); // Assumes MM/DD/YYYY
+                    return Integer.parseInt(parts[0]);
                 }
             }
             return Integer.parseInt(dateStr.trim());
         } catch (NumberFormatException e) {
-            return 1; // Fallback
+            return 1;
         }
     }
 }
+
