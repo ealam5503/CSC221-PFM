@@ -132,11 +132,16 @@ public class Storage {
      * @author Richard Medina
      */
     public void saveBudget(Budget budget) throws IOException {
-        // Example implementation hook:
-        // List<String> data = budget.serialize();
-        // writeFile("budget_" + budget.getYear() + ".txt", data);
+       if (budget == null) return;
+        
+        List<String> content = new ArrayList<>();
+        content.add(String.valueOf(budget.getYear()));
+        for (Transaction t : budget.getAllTransactions()) {
+        content.add(t.date() + "," + t.category() + "," + t.amount());
     }
-
+        writeFile("budget_" + budget.getYear() + ".txt", content);    
+}
+        
     /**
      * Deletes the saved budget for the given year.
      *
@@ -184,12 +189,28 @@ public class Storage {
      * @author Richard Medina
      */
     private Budget loadBudgetFromFile(int year) throws IOException {
-        Path filePath = Paths.get(dataDirectory, "budget_" + year + ".txt");
+     Path filePath = Paths.get(dataDirectory, "budget_" + year + ".txt");
         if (!Files.exists(filePath)) {
             return null;
         }
+        
         List<String> lines = readFile("budget_" + year + ".txt");
-        // Logic to construct and return a Budget object from lines goes here
-        return null; 
-    }
+        if (lines.isEmpty()) {
+            return null;
+        }
+
+        Budget budget = new Budget(year);
+
+        for (int i = 1; i < lines.size(); i++) {
+            String line = lines.get(i);
+            String[] parts = line.split(",");
+            if (parts.length == 3) {
+                String date = parts[0];
+                Category category = Category.valueOf(parts[1]);
+                int amount = Integer.parseInt(parts[2]);
+
+                budget.addTransaction(date, category, amount);
+            }
+        }
+        return budget;
 }
