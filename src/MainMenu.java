@@ -15,7 +15,6 @@ public class MainMenu {
 
     private List<Integer> budgetYears = new ArrayList<>();
     private Storage storage;
-    private Accounts accounts;
 
     /**
      * Creates the main menu.
@@ -151,9 +150,51 @@ public class MainMenu {
      * through the Storage module.
      *
      * @author Sam Strugger
+     * @author Asher Malik
      */
     public void deleteAnnualData() {
-        throw new UnsupportedOperationException("Annual data deletion is not implemented yet.");
+        if (storage == null) {
+            System.err.println("Budget storage is not connected yet.");
+            return;
+        }
+
+        try {
+            List<Integer> storedYears = storage.getBudgetYears();
+            if (storedYears == null) {
+                System.err.println("Could not load the stored budget years.");
+                return;
+            }
+            if (storedYears.isEmpty()) {
+                System.out.println("No stored budget years are available to delete.");
+                return;
+            }
+
+            budgetYears = storedYears;
+            int year = selectYear();
+            System.out.println("Are you sure you want to delete budget data for " + year + "? (y/n)");
+            if( !scanner.hasNextLine()){
+                return;
+            }
+            String confirmation = scanner.nextLine().trim();
+            if(!confirmation.equalsIgnoreCase("y") && !confirmation.equalsIgnoreCase("yes")){
+                System.out.println("Deletion canceled.");
+                return;
+            }
+            if (storage.deleteBudget(year)) {
+                budgetYears.remove(Integer.valueOf(year));
+
+                System.out.println("Budget data for " + year + " has been deleted.");
+
+            } else {
+                System.err.println("Could not delete the budget data for " + year + ".");
+            }
+
+        } catch (IOException e) {
+            System.err.println("Could not read the budget data: " + e.getMessage());
+        }catch (IllegalStateException e){
+            System.err.println(e.getMessage());
+        }
+
     }
 
     /**
