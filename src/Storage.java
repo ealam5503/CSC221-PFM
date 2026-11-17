@@ -87,8 +87,6 @@ public class Storage {
      * @author Juan Balbuena
      */
     public Budget getBudget(int year) throws IOException {
-        // Implementation will depend on how your Budget class is structured 
-        // (e.g., reading a file named "budget_" + year + ".txt")
         return loadBudgetFromFile(year);
     }
 
