@@ -60,16 +60,34 @@ public class Accounts {
      * @return              true if the sign in worked, false if the user name or
      *                      password is wrong
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public boolean signIn(String userName, String password) {
-        // TODO: Implement signIn.
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (userName == null || password == null) {
+            return false;
+        }
+
+        UserAccount account = users.get(userName);
+
+        if (account == null) {
+            return false;
+        }
+
+        String enteredHash = hashPassword(password, account.salt());
+
+        if (!enteredHash.equals(account.passwordHash())) {
+            return false;
+        }
+
+        currentUser = account;
+        return true;
     }
 
     /**
      * Signs out the current user.
      *
      * @author Ousseynou Diop
+     * @author Michael Lee
      */
     public void signOut() {
         currentUser = null;
