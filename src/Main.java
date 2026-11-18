@@ -1,4 +1,5 @@
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 /**
@@ -147,7 +148,10 @@ public class Main {
                 }
 
                 if (accounts.isSignedIn()) {
-                    MainMenu menu = new MainMenu(scanner, accounts);
+                    String dataDirectory = Path.of("data", accounts.getCurrentUserName()).toString();
+                    Storage storage = new Storage(dataDirectory);
+
+                    MainMenu menu = new MainMenu(scanner, accounts, storage);
 
                     while (accounts.isSignedIn()) {
                         menu.handleMenuSelection();

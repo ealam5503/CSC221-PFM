@@ -48,10 +48,10 @@ public class Budget {
      * Gets every transaction in this budget.
      *
      * @return a copy of the list of all transactions
-     * @author Juan Balbuena 
+     * @author Juan Balbuena
      */
     public List<Transaction> getAllTransactions() {
-        return null;
+        return new ArrayList<>(transactions);
     }
 
     /**
@@ -62,6 +62,12 @@ public class Budget {
      * @author Juan Balbuena
      */
     public List<Transaction> getTransactions(Category category) {
-        return null;
+        List<Transaction> matches = new ArrayList<>();
+        for (Transaction t : transactions) {
+            if (t.category() == category) {
+                matches.add(t);
+            }
+        }
+        return matches;
     }
 }
