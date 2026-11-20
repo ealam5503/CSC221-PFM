@@ -208,93 +208,144 @@ public class Reports {
             }
         }
     }
+   
+/**
+ * Prints the console report.
+ *
+ * @author Shuvo Barmon
+ */
+public void printConsoleReport() {
 
-    /**
-     * Prints the console report.
-     * 
-     * @author Shuvo Barmon
-     */
-    public void printConsoleReport() {
-        String[] months = {
-            "January", "February", "March", "April",
-            "May", "June", "July", "August",
-            "September", "October", "November", "December"
-        };
+    String[] months = {
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    };
 
-        double[] monthlyIncome = new double[12];
-        double[] monthlyExpenses = new double[12];
+    double[] monthlyIncome = new double[12];
+    double[] monthlyExpenses = new double[12];
 
-        // Calculate monthly income and expenses using record accessors
-        for (int i = 0; i < transactions.size(); i++) {
-            Transaction t = transactions.get(i);
+    // Get monthly income and expenses
+    for (int i = 0; i < transactions.size(); i++) {
 
-            int month = extractMonth(t.date());
-            double amount = t.amount();
+        Transaction t = transactions.get(i);
 
-            int index = month - 1;
+        int month = extractMonth(t.date());
+        double amount = t.amount();
+        int index = month - 1;
 
-            if (index < 0 || index >= 12) {
-                continue;
-            }
-
-            if (amount > 0) {
-                monthlyIncome[index] += amount;
-            } else if (amount < 0) {
-                monthlyExpenses[index] -= amount;
-            }
+        if (index < 0 || index >= 12) {
+            continue;
         }
 
-        // Calculate category totals
-        calculateCategoryTotals();
-
-        double totalIncome = 0;
-        double totalExpenses = 0;
-
-        System.out.println("ANNUAL FINANCIAL REPORT");
-        System.out.println("-------------------------");
-
-        // Print each month's report
-        for (int i = 0; i < 12; i++) {
-            double balance = monthlyIncome[i] - monthlyExpenses[i];
-
-            System.out.println("Month: " + months[i]);
-            System.out.println("Income: " + monthlyIncome[i]);
-            System.out.println("Expenses: " + monthlyExpenses[i]);
-            System.out.println("Balance: " + balance);
-            System.out.println("-------------------------");
-
-            totalIncome += monthlyIncome[i];
-            totalExpenses += monthlyExpenses[i];
-        }
-
-        // Print income categories
-        System.out.println("INCOME BY CATEGORY");
-        for (int i = 0; i < incomeCategories.length; i++) {
-            System.out.println(incomeCategories[i] + ": " + incomeTotals[i]);
-        }
-
-        // Print expense categories
-        System.out.println("EXPENSES BY CATEGORY");
-        for (int i = 0; i < expenseCategories.length; i++) {
-            System.out.println(expenseCategories[i] + ": " + expenseTotals[i]);
-        }
-
-        // Calculate yearly balance
-        double yearlyBalance = totalIncome - totalExpenses;
-
-        System.out.println("YEARLY SUMMARY");
-        System.out.println("Total Income: " + totalIncome);
-        System.out.println("Total Expenses: " + totalExpenses);
-        System.out.println("Yearly Balance: " + yearlyBalance);
-
-        if (yearlyBalance > 0) {
-            System.out.println("Status: Surplus");
-        } else if (yearlyBalance < 0) {
-            System.out.println("Status: Deficit");
-        } else {
-            System.out.println("Status: Balanced");
+        if (amount > 0) {
+            monthlyIncome[index] += amount;
+        } else if (amount < 0) {
+            monthlyExpenses[index] -= amount;
         }
     }
+
+    // Calculate category totals
+    calculateCategoryTotals();
+
+    double totalIncome = 0;
+    double totalExpenses = 0;
+
+    System.out.println();
+    System.out.println("================================================================================");
+    System.out.println("                           ANNUAL FINANCIAL REPORT");
+    System.out.println("================================================================================");
+
+    // Monthly table heading
+    System.out.printf("%-18s %19s %19s %19s%n",
+            "Month", "Income", "Expenses", "Balance");
+
+    System.out.println("--------------------------------------------------------------------------------");
+
+    // Print all 12 months
+    for (int i = 0; i < 12; i++) {
+
+        double balance = monthlyIncome[i] - monthlyExpenses[i];
+
+        System.out.printf("%-18s $%,18.0f $%,18.0f $%,18.0f%n",
+                months[i], monthlyIncome[i],
+                monthlyExpenses[i], balance);
+
+        totalIncome += monthlyIncome[i];
+        totalExpenses += monthlyExpenses[i];
+    }
+
+    double yearlyBalance = totalIncome - totalExpenses;
+
+    System.out.println("--------------------------------------------------------------------------------");
+
+    System.out.printf("%-18s $%,18.0f $%,18.0f $%,18.0f%n",
+            "TOTAL", totalIncome, totalExpenses, yearlyBalance);
+
+    System.out.println("================================================================================");
+
+    // Income category report
+    System.out.println();
+    System.out.println("                         INCOME BY CATEGORY");
+    System.out.println("------------------------------------------------------------");
+
+    for (int i = 0; i < incomeCategories.length; i++) {
+
+        String category = incomeCategories[i].replace("_", " ");
+
+        System.out.printf("%-35s $%,20.0f%n",
+                category, incomeTotals[i]);
+    }
+
+    System.out.println("------------------------------------------------------------");
+
+    System.out.printf("%-35s $%,20.0f%n",
+            "Total Income", totalIncome);
+
+    // Expense category report
+    System.out.println();
+    System.out.println("                        EXPENSES BY CATEGORY");
+    System.out.println("------------------------------------------------------------");
+
+    for (int i = 0; i < expenseCategories.length; i++) {
+
+        String category = expenseCategories[i].replace("_", " ");
+
+        System.out.printf("%-35s $%,20.0f%n",
+                category, expenseTotals[i]);
+    }
+
+    System.out.println("------------------------------------------------------------");
+
+    System.out.printf("%-35s $%,20.0f%n",
+            "Total Expenses", totalExpenses);
+
+    // Annual summary
+    System.out.println();
+    System.out.println("                           ANNUAL SUMMARY");
+    System.out.println("------------------------------------------------------------");
+
+    System.out.printf("%-35s $%,20.0f%n",
+            "Total Income", totalIncome);
+
+    System.out.printf("%-35s $%,20.0f%n",
+            "Total Expenses", totalExpenses);
+
+    System.out.printf("%-35s $%,20.0f%n",
+            "Yearly Balance", yearlyBalance);
+
+    System.out.println("------------------------------------------------------------");
+
+    if (yearlyBalance > 0) {
+        System.out.println("Status: Surplus");
+    } else if (yearlyBalance < 0) {
+        System.out.println("Status: Deficit");
+    } else {
+        System.out.println("Status: Balanced");
+    }
+
+    System.out.println("================================================================================");
+}
 
     /**
      * Helper method to safely parse the month integer from a Transaction date string.
