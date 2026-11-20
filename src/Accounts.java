@@ -26,7 +26,8 @@ import java.nio.file.Paths;
  * @author Michael Lee
  * @author Wasif Ahmed
  */
-public class Accounts {
+public class Accounts 
+{
 
     /** Name of the file where all user accounts are saved. */
     public static final String USERS_FILE_NAME = "users.csv";
@@ -42,17 +43,16 @@ public class Accounts {
 
     /**
      * Creates the Accounts module with an empty account collection and 
-     * loads saved accounts will be implemented later.
      *
      * @param usersFilePath where the users file is located
      * @author Ousseynou Diop
      * @author Michael Lee
+     * @author Wasif Ahmed
      */
     public Accounts(String usersFilePath) 
     {
         this.usersFilePath = usersFilePath;
-        this.users = new HashMap<>(); // Creates empty account collection for now
-        this.users.putAll(loadUsers()); // Fill hashmap with loaded values from a csv
+        this.users = loadUsers(); // Fill hashmap with loaded values from a csv
     }
 
     /**
@@ -64,23 +64,14 @@ public class Accounts {
      *                      password is wrong
      * @author Ousseynou Diop
      * @author Michael Lee
+     * @author Wasif Ahmed
      */
     public boolean signIn(String userName, String password) {
-        if (userName == null || password == null) {
-            return false;
-        }
+        if (userName == null || password == null) return false;
 
         UserAccount account = users.get(userName);
 
-        if (account == null) {
-            return false;
-        }
-
-        String enteredHash = hashPassword(password, account.salt());
-
-        if (!enteredHash.equals(account.passwordHash())) {
-            return false;
-        }
+        if (account == null || !verifyPassword(account, password)) return false;
 
         currentUser = account;
         return true;
@@ -176,10 +167,7 @@ public class Accounts {
      */
     public boolean changePassword(String currentPassword, String newPassword) 
     {
-        if (currentUser == null) return false;
-
-        String currHash = hashPassword(currentPassword, currentUser.salt());
-        if (!currHash.equals(currentUser.passwordHash())) return false;
+        if (currentUser == null || !verifyPassword(currentUser, currentPassword)) return false;
 
         String newHash = hashPassword(newPassword, currentUser.salt());
         UserAccount updatedAccount = new UserAccount(currentUser.userName(), currentUser.salt(), newHash, currentUser.secretQuestion(), currentUser.secretAnswerHash());
@@ -211,8 +199,7 @@ public class Accounts {
         if (unsignedAccount == null) return false;
         if (currentUser != null && !currentUser.userName().equals(userName)) return false;
 
-        String currHash = hashPassword(secretAnswer.trim().toLowerCase(), unsignedAccount.salt());
-        if (!currHash.equals(unsignedAccount.secretAnswerHash())) return false;
+        if (!verifySecretAnswer(unsignedAccount, secretAnswer)) return false;
 
         String newHash = hashPassword(newPassword, unsignedAccount.salt());
         UserAccount updatedAccount = new UserAccount(unsignedAccount.userName(), unsignedAccount.salt(), newHash, unsignedAccount.secretQuestion(), unsignedAccount.secretAnswerHash());
@@ -255,10 +242,7 @@ public class Accounts {
      */
     public boolean deleteUser(String password) 
     {
-        if (currentUser == null) return false;
-
-        String currHash = hashPassword(password, currentUser.salt());
-        if (!currHash.equals(currentUser.passwordHash())) return false;
+        if (currentUser == null || !verifyPassword(currentUser, password)) return false;
 
         users.remove(currentUser.userName());
         saveUsers();
@@ -364,4 +348,31 @@ public class Accounts {
             throw new UncheckedIOException("Error: Could not save users file", e);
         }
     }
+
+    /**
+     * Verifies if the inputted password is correct.
+     * 
+     * @param account   the account to check the input against.
+     * @param password  the password to check.
+     * @return          true if the input matches the password stored in the Account and false otherwise.
+     * @author Wasif Ahmed
+    */
+    private static boolean verifyPassword(UserAccount account, String password)
+    {
+        return hashPassword(password, account.salt()).equals(account.passwordHash());
+    }
+
+    /**
+     * Verifies if the inputted secret answer is correct.
+     * 
+     * @param account   the account to check the input against.
+     * @param answer    the secret answer to check.
+     * @return          true if the input matches the secret answer stored in the Acccount and false otherwise.
+     * @author Wasif Ahmed
+     */
+    private static boolean verifySecretAnswer(UserAccount account, String answer)
+    {
+         return hashPassword(answer.trim().toLowerCase(), account.salt()).equals(account.secretAnswerHash());
+    }
+
 }
