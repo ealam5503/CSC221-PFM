@@ -229,16 +229,16 @@ public static boolean fileValidate(List<String> lines, String filename) {
         return true;
     }
     /**
-     * Types of console operations.
+     * Kinds of console input checked by inputValidate().
      *
      * @author Yugin Belbase
      */
     public enum InputType {
         /** User is navigating the menu*/
         MENU_CHOICE, 
-        /** User is choosing if they want to display CSV file with data in incorrect format*/
+        /** User is answering a yes/no question (y, yes, n, or no)*/
         YES_NO, 
-        /** Year of date in CSV file*/
+        /** User is selecting the year of the desired CSV file (four digits, from MIN_YEAR to the current year)*/
         YEAR, 
         /** User is inputting their username*/
         USERNAME, 
@@ -295,7 +295,7 @@ public static boolean fileValidate(List<String> lines, String filename) {
      *
      * Leading and trailing spaces are ignored for every type except PASSWORD.
      *
-     * @param input command entered by the user
+     * @param input the text entered by the user
      * @param type the member of InputType expected for the entry
      * @param minOption lowest valid menu number (MENU_CHOICE only; pass 0 for other types)
      * @param maxOption highest valid menu number (MENU_CHOICE only; pass 0 for other types)
