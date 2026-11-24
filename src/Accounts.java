@@ -160,14 +160,16 @@ public class Accounts
      * @param currentPassword       the user's current password
      * @param newPassword           the new password
      * @return                      true if the password was changed, false if the current
-*                                   password is wrong
+     *                              password is wrong or the new password is the same as the old one
      * @author Ousseynou Diop
      * @author Michael Lee
      * @author Wasif Ahmed
+     * @bug 40 New password could be identical to the old password.
      */
     public boolean changePassword(String currentPassword, String newPassword) 
     {
         if (currentUser == null || !verifyPassword(currentUser, currentPassword)) return false;
+        if (verifyPassword(currentUser, newPassword)) return false; // Bug #40: new password must be different
 
         String newHash = hashPassword(newPassword, currentUser.salt());
         UserAccount updatedAccount = new UserAccount(currentUser.userName(), currentUser.salt(), newHash, currentUser.secretQuestion(), currentUser.secretAnswerHash());
@@ -188,10 +190,11 @@ public class Accounts
      * @param secretAnswer the answer to the secret question
      * @param newPassword  the new password
      * @return             true if the password was changed, false if the user name or
-     *                     answer is wrong
+     *                     answer is wrong, or the new password is the same as the old one
      * @author Ousseynou Diop
      * @author Michael Lee
      * @author Wasif Ahmed
+     * @bug 40 New password during reset could be identical to the old password.
      */
     public boolean changePassword(String userName, String secretAnswer, String newPassword) 
     {
@@ -200,6 +203,7 @@ public class Accounts
         if (currentUser != null && !currentUser.userName().equals(userName)) return false;
 
         if (!verifySecretAnswer(unsignedAccount, secretAnswer)) return false;
+        if (verifyPassword(unsignedAccount, newPassword)) return false; // Bug #40: new password must be different
 
         String newHash = hashPassword(newPassword, unsignedAccount.salt());
         UserAccount updatedAccount = new UserAccount(unsignedAccount.userName(), unsignedAccount.salt(), newHash, unsignedAccount.secretQuestion(), unsignedAccount.secretAnswerHash());
