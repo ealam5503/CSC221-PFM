@@ -10,20 +10,17 @@ import java.util.List;
  */
 public class Validation {
 
-    /**
-    * Empty constructor for Validation class for instantiation
-    * @author Eliott Edeki
-    */
 
+    //Private constructor to avoid javadoc generation
     private Validation(){
 
     }
 
     /**
-     * Check that the date in CSV file has correct format
-     * and all dates are from the same year.
+     * Verifies date strings in the CSV file are from the same
+     * year and correctly formatted.
      *
-     * @param date date entered in CSV file
+     * @param date date read from CSV file
      * @return true if date is valid, false if format of date
      *         is incorrect or dates have different years
      * @author Eliott Edeki
@@ -80,45 +77,46 @@ public class Validation {
     }
 
     /**
-    * Categories allowed in CSV file
+    * Categories allowed in CSV file.
     * @author Eliott Edeki
     */
     public enum Categories{
-        /** Income: net pay after taxes and other deductions. */
+        /** Income: net pay after taxes and other deductions */
         COMPENSATION,
-        /** Income: contributions from others, including financial aid. */
+        /** Income: contributions from others, including financial aid */
         ALLOWANCE,
-        /** Income: unearned income after taxes. */
+        /** Income: unearned income after taxes */
         INVESTMENTS,
-        /** Income: any other income. */
+        /** Income: any other income */
         INCOME_OTHER,
-        /** Expense: rent, mortgage, repairs, furniture, housewares, insurance, cleaning. */
+        /** Expense: rent, mortgage, repairs, furniture, housewares, insurance, cleaning */
         HOME,
-        /** Expense: gas, electric, phone, ISP for home. */
+        /** Expense: gas, electric, phone, ISP for home */
         UTILITIES,
-        /** Expense: groceries, non-entertainment meals. */
+        /** Expense: groceries, non-entertainment meals */
         FOOD,
-        /** Expense: clothing, grooming. */
+        /** Expense: clothing, grooming */
         APPEARANCE,
-        /** Expense: unreimbursed business expenses, uniforms, work-related services. */
+        /** Expense: unreimbursed business expenses, uniforms, work-related services */
         WORK,
-        /** Expense: tuition, tutors, supplies. */
+        /** Expense: tuition, tutors, supplies */
         EDUCATION,
-        /** Expense: taxis, transit fares, personal vehicle (insurance, lease, fuel, repairs). */
+        /** Expense: taxis, transit fares, personal vehicle (insurance, lease, fuel, repairs) */
         TRANSPORTATION,
-        /** Expense: subscriptions, dining out, admissions, gifts, vacations. */
+        /** Expense: subscriptions, dining out, admissions, gifts, vacations */
         ENTERTAINMENT,
-        /** Expense: unreimbursed medical, lawyers, consultants. */
+        /** Expense: unreimbursed medical, lawyers, consultants */
         PROFESSIONAL_SERVICES,
-        /** Expense: all other expenses. */
+        /** Expense: all other expenses */
         EXPENSE_OTHER
     }
     
     /**
-     * Check that category in CSV file is from the specified terms.
+     * Checks whether the category stored in the CSV file
+     * can be found in the Categories enum.
      *
      * @param category category entered in CSV file
-     * @return true if category is from approved terms, false otherwise
+     * @return true if category is in Categories, false otherwise
      * @author Eliott Edeki
      */
    
@@ -136,7 +134,8 @@ public class Validation {
     }
 
     /**
-     * Check amount is an integer.
+     * Checks whether CSV amounts column entry is 
+     * an integer.
      *
      * @param amount amount entered in CSV file
      * @return true if integer, otherwise false
@@ -158,8 +157,8 @@ public class Validation {
      * Checks format of header in CSV file.
      *
      * @param header header of CSV file
-     * @param headercount count how many headers in CSV file
-     * @return true if format matches, otherwise false
+     * @param headercount number of header columns in CSV file
+     * @return true if format matches expected value, otherwise false
      * @author Amina Zaman
      */
 public static boolean headerValidate(String header, int headercount) {
@@ -174,10 +173,10 @@ public static boolean headerValidate(String header, int headercount) {
     return header.equals("Date,Category,Amount");
 }
     /**
-     * Checks that the CSV file has the correct format
+     * Verifies that the CSV file has the correct format
      * and contains valid data.
      *
-     * @param lines lines from the CSV file
+     * @param lines row entries from the CSV file
      * @param filename name of the CSV file
      * @return true if file is valid, false otherwise
      * @author Amina Zaman
@@ -230,7 +229,7 @@ public static boolean fileValidate(List<String> lines, String filename) {
         return true;
     }
     /**
-     * Kinds of console entries checked by inputValidate().
+     * Types of console operations.
      *
      * @author Yugin Belbase
      */
@@ -241,9 +240,9 @@ public static boolean fileValidate(List<String> lines, String filename) {
         YES_NO, 
         /** Year of date in CSV file*/
         YEAR, 
-        /** User is inputing their username*/
+        /** User is inputting their username*/
         USERNAME, 
-        /** User is inputing their password*/
+        /** User is inputting their password*/
         PASSWORD, 
         /** All other inputs*/
         TEXT
@@ -296,8 +295,8 @@ public static boolean fileValidate(List<String> lines, String filename) {
      *
      * Leading and trailing spaces are ignored for every type except PASSWORD.
      *
-     * @param input the text the user typed
-     * @param type the kind of entry expected
+     * @param input command entered by the user
+     * @param type the member of InputType expected for the entry
      * @param minOption lowest valid menu number (MENU_CHOICE only; pass 0 for other types)
      * @param maxOption highest valid menu number (MENU_CHOICE only; pass 0 for other types)
      * @return true if the entry is valid, false otherwise
@@ -364,7 +363,7 @@ public static boolean fileValidate(List<String> lines, String filename) {
      * Prints any CSV issues found and reports whether the file
      * has data that is formatted incorrectly.
      *
-     * @param issues one message per invalid line
+     * @param issues list of issues, with one entry per invalid CSV row
      * @return true if there is at least one issue, false if there are none
      * @author Yugin Belbase
      */
