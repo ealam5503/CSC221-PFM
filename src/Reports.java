@@ -55,6 +55,9 @@ public class Reports {
 
     /**
      * Exports the annual financial report to a CSV file for spreadsheet manipulation.
+     * The report is always written to {@code annual_report.csv} in the folder the
+     * program is run from, replacing any earlier export. Errors are printed to the
+     * console instead of being thrown.
      * 
      * @author Colin Russell
      */
@@ -155,7 +158,10 @@ public class Reports {
     }
         
     /**
-     * Calculates expenditure totals aggregated by financial category.
+     * Calculates the yearly income and expense totals for each category.
+     * Positive amounts are added to income categories and negative amounts to
+     * expense categories. A transaction whose category does not match is counted
+     * under INCOME_OTHER or EXPENSE_OTHER.
      * 
      * @author Marlin Canelo
      */
@@ -210,7 +216,8 @@ public class Reports {
     }
    
 /**
- * Prints the console report.
+ * Prints the annual report to the console: income, expenses, and balance for
+ * each month, totals by category, and the yearly surplus or deficit.
  *
  * @author Shuvo Barmon
  */
@@ -349,6 +356,12 @@ public void printConsoleReport() {
 
     /**
      * Helper method to safely parse the month integer from a Transaction date string.
+     * Accepts MM/DD/YYYY or YYYY-MM-DD. A null, empty, or unreadable date
+     * returns 1 (January).
+     *
+     * @param dateStr the date of the transaction
+     * @return the month number from the date (callers skip values outside 1 to 12)
+     * @author Marlin Canelo
      */
     private int extractMonth(String dateStr) {
         if (dateStr == null || dateStr.isEmpty()) {
