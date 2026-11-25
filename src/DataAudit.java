@@ -33,7 +33,7 @@ public class DataAudit {
 	 * @author Bobby Lu
 	 * @author Genesis Vejar
 	 */
-	private DataAudit() {
+	public DataAudit() {
 		// Nothing to do: the exclusion set is initialized at its declaration.
 		// Constructor included for JavaDoc.
 	}
