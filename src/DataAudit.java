@@ -132,14 +132,16 @@ public class DataAudit {
 	 * @author Bobby Lu
 	 */
 	private List<AuditFinding> findAnomalies(List<Transaction> entries) {
-		// TODO: compute a typical monthly amount per category and flag outliers
+		// TODO: 
 
 		if (entries == null)
 			throw new IllegalArgumentException("Entries cannot be null");
 
 		List<AuditFinding> anomalies = new ArrayList<>();
-
+		
+		//Layered map for monthlyTotals and monethlyEntries
 		Map<String, Map<String, Long>> monthlyTotals = new HashMap<>();
+		Map<String, Map<String, List<Transaction>>> monthlyEntries = new HashMap<>();
 		for (Transaction transaction : entries) {
 
 			// Prevents excluded categories from contributing to monthly total
@@ -147,7 +149,7 @@ public class DataAudit {
 				continue;
 			String month = transaction.date().substring(0, 2);
 			boolean expense = transaction.amount() < 0;
-			String groupKey = transaction.category() + (expense ? "_EXPENSE" : "_INCOME");
+			String groupKey = transaction.category().name() + (expense ? "_EXPENSE" : "_INCOME");
 
 			// If the inner hashMap doesn't have every category key then it creates one;
 			if (!monthlyTotals.containsKey(groupKey)) {
@@ -159,6 +161,18 @@ public class DataAudit {
 
 			long amount = Math.abs((long) transaction.amount());
 			categoryTotals.put(month, categoryTotals.getOrDefault(month, 0L) + amount);
+			
+			if (!monthlyEntries.containsKey(groupKey)) {
+			    monthlyEntries.put(groupKey, new HashMap<>());
+			}
+
+			Map<String, List<Transaction>> entriesByMonth = monthlyEntries.get(groupKey);
+
+			if (!entriesByMonth.containsKey(month)) {
+			    entriesByMonth.put(month, new ArrayList<>());
+			}
+
+			entriesByMonth.get(month).add(transaction);
 		}
 		// Looping through each keySet in monthly totals
 		for (String groupKey : monthlyTotals.keySet()) {
@@ -166,7 +180,7 @@ public class DataAudit {
 			// Creates list of values without their keys
 			List<Long> amounts = new ArrayList<>(categoryTotals.values());
 			Collections.sort(amounts);
-			// If there are less than 3 entry's for each month then the month is skipped for
+			// Skip this category/direction group if it has fewer than 3 observed months.
 			// anomaly checking
 			if (amounts.size() < 3)
 				continue;
@@ -186,28 +200,34 @@ public class DataAudit {
 			double lowThreshold = median / 2.5;
 			
 			for (String month : categoryTotals.keySet()) {
-				long monthlyAmount = categoryTotals.get(month);
-				if (monthlyAmount >= highThreshold || monthlyAmount <= lowThreshold) {
-					for (Transaction transaction : entries) {
-						if (month.equals(transaction.date().substring(0, 2))) {
-							boolean expense = transaction.amount() < 0;
-							String transactionGroupKey = transaction.category().name() + (expense ? "_EXPENSE" : "_INCOME");
-							if (groupKey.equals(transactionGroupKey)) {
-								String reason = "Monthly total: $" + monthlyAmount + ", Median: $" + median;
-								// Record each transaction from the anomalous month.
-								AuditFinding findings = new AuditFinding(
-										transaction.date(),
-										transaction.category(),
-										transaction.amount(),
-										FindingType.ANOMALY,
-										reason
-										);
-								anomalies.add(findings);
-							}
-						}
+			    long monthlyAmount = categoryTotals.get(month);
 
-					}
-				}
+			    if (monthlyAmount >= highThreshold || monthlyAmount <= lowThreshold) {
+			    	String direction = groupKey.endsWith("_EXPENSE") ? "spending" : "income";
+			    	String level = monthlyAmount >= highThreshold ? "high" : "low";
+			    	
+			    	long displayedMedian = Math.round(median);
+			    	String approximation = median == displayedMedian ? "" : "approximately";
+			    	
+			    	String reason = "Monthly " + direction + " is unusually " + level
+			    	        + ": $" + monthlyAmount
+			    	        + " total; typical monthly " + direction + ": "+ approximation +" $" + displayedMedian + ".";
+
+			        List<Transaction> contributingEntries =
+			                monthlyEntries.get(groupKey).get(month);
+
+			        for (Transaction transaction : contributingEntries) {
+			            AuditFinding finding = new AuditFinding(
+			                    transaction.date(),
+			                    transaction.category(),
+			                    transaction.amount(),
+			                    FindingType.ANOMALY,
+			                    reason
+			            );
+
+			            anomalies.add(finding);
+			        }
+			    }
 			}
 		} // end of keySet loop
 
