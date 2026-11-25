@@ -9,6 +9,9 @@
  * @param secretAnswerHash the hashed secret answer
  *
  * @author Ousseynou Diop
+ * @bug Fixed crash on startup when loading users.csv (Issue #29)
+ * @bug Fixed logic flaw where new password could be identical to the old password (Issue #40)
+ *
  */
 public record UserAccount(String userName, String salt, String passwordHash, String secretQuestion, String secretAnswerHash) 
 {
@@ -16,6 +19,7 @@ public record UserAccount(String userName, String salt, String passwordHash, Str
      * Turns this account into one line of text for the users file so it can be saved in users.csv file.
      *
      * @return the account as CSV (one comma-separated) line
+     * @throws NullPointerException if joining fields fails due to a null reference
      * @author Ousseynou Diop
      * @author Wasif Ahmed
      */
