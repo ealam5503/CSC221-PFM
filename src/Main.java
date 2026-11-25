@@ -21,6 +21,7 @@ public class Main {
      * Starts the application. No command-line arguments are required.
      *
      * @param args command-line arguments; unused
+     * @throws UncheckedIOException if an I/O error occurs while accessing account data
      * @author Sam Strugger
      */
     public static void main(String[] args) {
@@ -172,6 +173,7 @@ public class Main {
      * @param type the kind of input to validate
      * @param errorMessage the message to display for invalid input
      * @return the validated input, or null if console input ends
+     * @throws IllegalArgumentException if input validation rejects invalid configuration arguments
      * @author Sam Strugger
      */
     private static String readInput(Scanner scanner, String prompt, Validation.InputType type, String errorMessage) {
