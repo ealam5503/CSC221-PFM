@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -49,6 +50,8 @@ public class MainMenu {
         System.out.println("3. Generate annual report");
         System.out.println("4. Audit annual data");
         System.out.println("5. Sign out");
+        System.out.println("6. Change password");
+        System.out.println("7. Delete account");
         System.out.println();
         System.out.print("Enter your selection: ");
     }
@@ -72,7 +75,7 @@ public class MainMenu {
             try {
                 selection = Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.err.println("Please enter a number between 1 and 5.");
+                System.err.println("Please enter a number between 1 and 7.");
                 continue;
             }
 
@@ -92,8 +95,14 @@ public class MainMenu {
                 case 5:
                     signOut();
                     return;
+                case 6:
+                    changePassword();
+                    return;
+                case 7:
+                    deleteUser();
+                    return;
                 default:
-                    System.err.println("Please enter a number between 1 and 5.");
+                    System.err.println("Please enter a number between 1 and 7.");
             }
         }
     }
@@ -598,6 +607,102 @@ public class MainMenu {
             System.err.println("Could not read the budget data: " + e.getMessage());
         } catch (IllegalStateException e) {
             System.err.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Prompts the signed-in user for their current password and a new password.
+     * Blank input returns to the main menu without making a change.
+     *
+     * @bug Added access to signed-in password changes (Issue #38)
+     * @author Sam Strugger
+     */
+    public void changePassword(){
+
+        if (!accounts.isSignedIn()){
+            System.err.println("Sign in before changing your password.");
+            return;
+        }
+
+        System.out.print("Current password (leave blank to cancel): ");
+        if (!scanner.hasNextLine()) return;
+
+        String currentPassword = scanner.nextLine();
+        if (currentPassword.isEmpty()) return;
+
+        System.out.println("New passwords must have at least " + Validation.MIN_PASSWORD_LENGTH + " characters with no spaces.");
+
+        while (true){
+            System.out.print("New password (leave blank to cancel): ");
+            if (!scanner.hasNextLine()) return;
+
+            String newPassword = scanner.nextLine();
+            if (newPassword.isEmpty()) return;
+
+            if (!Validation.inputValidate(newPassword, Validation.InputType.PASSWORD, 0, 0)){
+                System.err.println("Use at least " + Validation.MIN_PASSWORD_LENGTH + " characters with no spaces.");
+                continue;
+            }
+            if (newPassword.equals(currentPassword)){
+                System.err.println("Choose a password different from your current password.");
+                continue;
+            }
+
+            try {
+                if (accounts.changePassword(currentPassword, newPassword)){
+                    System.out.println("Your password has been changed.");
+                } else {
+                    System.err.println("The current password was incorrect. Your password has not been changed.");
+                }
+            } catch (UncheckedIOException e) {
+                System.err.println("Could not save the password change: " + e.getMessage());
+            }
+            return;
+        }
+    }
+
+    /**
+     * Confirms account deletion with the signed-in user's password, then
+     * requests removal of their saved budgets through Storage.
+     * Blank input or declining confirmation returns to the main menu.
+     *
+     * @author Sam Strugger
+     */
+    public void deleteUser(){
+
+        if (!accounts.isSignedIn()){
+            System.err.println("Sign in before deleting your account.");
+            return;
+        }
+
+        System.out.println("Deleting your account will also remove all of your saved budget data.");
+        System.out.print("Password (leave blank to cancel): ");
+        if (!scanner.hasNextLine()) return;
+
+        String password = scanner.nextLine();
+        if (password.isEmpty()) return;
+
+        if (!confirmAction("Delete your account and saved budget data? (y/n): ")){
+            System.out.println("Account deletion canceled.");
+            return;
+        }
+
+        try {
+            if (!accounts.deleteUser(password)){
+                System.err.println("Incorrect password. Your account has not been deleted.");
+                return;
+            }
+        } catch (UncheckedIOException e) {
+            System.err.println("Could not save the account deletion: " + e.getMessage());
+            return;
+        }
+
+        budgetYears = new ArrayList<>();
+        try {
+            storage.deleteData();
+            System.out.println("Your account has been deleted.");
+        } catch (IOException e) {
+            System.err.println("Your account was deleted, but saved budget data could not be removed: " + e.getMessage());
         }
     }
 
