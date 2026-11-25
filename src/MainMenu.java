@@ -487,6 +487,7 @@ public class MainMenu {
      * @author Sam Strugger
      * @author Asher Malik
      * @bug #36 Category presented in "Exclude category" sub menu are off by one character space starting at option 10
+     * @bug #37 Although not critical, it would be beneficial to shrink the option menu when excluding a category.
      */
     public void auditAnnualData() {
         if (storage == null) {
@@ -559,14 +560,23 @@ public class MainMenu {
                         System.out.println(dataAudit.runAudit(entries));
                         break;
                     case 2:
-                        System.out.println();
-                        for (int i = 0; i < categories.length; i++) {
-                            System.out.printf("%2d. %s%n",(i + 1) + ". " + categories[i].name().replace('_', ' '));
-                        }
-                        System.out.printf("%2d. Return to audit menu%n", 0);
-
                         while (true) {
-                            System.out.print("Select a category to exclude (0-" + categories.length + "): ");
+                            List<Category> available = new ArrayList<>();
+                            for(Category c : categories){
+                                if(!dataAudit.getExcludedCategories().contains(c)){
+                                    available.add(c);
+                                }
+                            }
+                            if(available.isEmpty()){
+                                System.out.println("All categories are already excluded");
+                                break;
+                            }
+                            System.out.println();
+                            for (int i = 0; i < available.size(); i++) {
+                                System.out.printf("%2d. %s%n", (i + 1), available.get(i).name().replace('_', ' '));
+                            }
+                            System.out.printf("%2d. Return to audit menu%n", 0);
+                            System.out.print("Select a category to exclude (0-" + available.size() + "): ");
                             if (!scanner.hasNextLine()) {
                                 return;
                             }
@@ -587,7 +597,7 @@ public class MainMenu {
                                 continue;
                             }
 
-                            Category category = categories[categorySelection - 1];
+                            Category category = available.get(categorySelection-1);
                             dataAudit.setExcludedCategories(category);
                             System.out.println("Excluded " + category.name().replace('_', ' ') + ".");
                         }
