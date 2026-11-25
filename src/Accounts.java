@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 
 /**
- * takes care of user accounts for the PFM: creating an account, signing in,
+ * Takes care of user accounts for the PFM: creating an account, signing in,
  * signing out, changing a password, and deleting an account.
  *
  * Passwords and secret answers are never saved as plain text. They are
@@ -25,9 +25,11 @@ import java.nio.file.Paths;
  * @author Ousseynou Diop
  * @author Michael Lee
  * @author Wasif Ahmed
+ * @bug Fixed crash on startup when users.csv exists (Issue #29)
+ * @bug Fixed logic flaw where new password could be identical to the old password (Issue #40)
  */
-public class Accounts 
-{
+
+public class Accounts {
 
     /** Name of the file where all user accounts are saved. */
     public static final String USERS_FILE_NAME = "users.csv";
@@ -42,17 +44,18 @@ public class Accounts
     private UserAccount currentUser;
 
     /**
-     * Creates the Accounts module with an empty account collection and 
+     * Creates the Accounts module and loads existing user accounts from the
+     * specified file path if it exists.
      *
      * @param usersFilePath where the users file is located
      * @author Ousseynou Diop
      * @author Michael Lee
-     * @author Wasif Ahmed
      */
     public Accounts(String usersFilePath) 
     {
         this.usersFilePath = usersFilePath;
-        this.users = loadUsers(); // Fill hashmap with loaded values from a csv
+        this.users = new HashMap<>(); // Creates empty account collection for now
+        this.users.putAll(loadUsers()); // Fill hashmap with loaded values from a csv
     }
 
     /**
@@ -64,14 +67,23 @@ public class Accounts
      *                      password is wrong
      * @author Ousseynou Diop
      * @author Michael Lee
-     * @author Wasif Ahmed
      */
     public boolean signIn(String userName, String password) {
-        if (userName == null || password == null) return false;
+        if (userName == null || password == null) {
+            return false;
+        }
 
         UserAccount account = users.get(userName);
 
-        if (account == null || !verifyPassword(account, password)) return false;
+        if (account == null) {
+            return false;
+        }
+
+        String enteredHash = hashPassword(password, account.salt());
+
+        if (!enteredHash.equals(account.passwordHash())) {
+            return false;
+        }
 
         currentUser = account;
         return true;
@@ -160,16 +172,17 @@ public class Accounts
      * @param currentPassword       the user's current password
      * @param newPassword           the new password
      * @return                      true if the password was changed, false if the current
-     *                              password is wrong or the new password is the same as the old one
+     *                              password is wrong
      * @author Ousseynou Diop
      * @author Michael Lee
      * @author Wasif Ahmed
-     * @bug 40 New password could be identical to the old password.
      */
     public boolean changePassword(String currentPassword, String newPassword) 
     {
-        if (currentUser == null || !verifyPassword(currentUser, currentPassword)) return false;
-        if (verifyPassword(currentUser, newPassword)) return false; // Bug #40: new password must be different
+        if (currentUser == null) return false;
+
+        String currHash = hashPassword(currentPassword, currentUser.salt());
+        if (!currHash.equals(currentUser.passwordHash())) return false;
 
         String newHash = hashPassword(newPassword, currentUser.salt());
         UserAccount updatedAccount = new UserAccount(currentUser.userName(), currentUser.salt(), newHash, currentUser.secretQuestion(), currentUser.secretAnswerHash());
@@ -190,11 +203,10 @@ public class Accounts
      * @param secretAnswer the answer to the secret question
      * @param newPassword  the new password
      * @return             true if the password was changed, false if the user name or
-     *                     answer is wrong, or the new password is the same as the old one
+     *                     answer is wrong
      * @author Ousseynou Diop
      * @author Michael Lee
      * @author Wasif Ahmed
-     * @bug 40 New password during reset could be identical to the old password.
      */
     public boolean changePassword(String userName, String secretAnswer, String newPassword) 
     {
@@ -202,8 +214,8 @@ public class Accounts
         if (unsignedAccount == null) return false;
         if (currentUser != null && !currentUser.userName().equals(userName)) return false;
 
-        if (!verifySecretAnswer(unsignedAccount, secretAnswer)) return false;
-        if (verifyPassword(unsignedAccount, newPassword)) return false; // Bug #40: new password must be different
+        String currHash = hashPassword(secretAnswer.trim().toLowerCase(), unsignedAccount.salt());
+        if (!currHash.equals(unsignedAccount.secretAnswerHash())) return false;
 
         String newHash = hashPassword(newPassword, unsignedAccount.salt());
         UserAccount updatedAccount = new UserAccount(unsignedAccount.userName(), unsignedAccount.salt(), newHash, unsignedAccount.secretQuestion(), unsignedAccount.secretAnswerHash());
@@ -246,7 +258,10 @@ public class Accounts
      */
     public boolean deleteUser(String password) 
     {
-        if (currentUser == null || !verifyPassword(currentUser, password)) return false;
+        if (currentUser == null) return false;
+
+        String currHash = hashPassword(password, currentUser.salt());
+        if (!currHash.equals(currentUser.passwordHash())) return false;
 
         users.remove(currentUser.userName());
         saveUsers();
@@ -262,6 +277,7 @@ public class Accounts
      * @param plainText     the password or answer to hash
      * @param salt          a random value saved with the user's account
      * @return              the hashed text
+     * @throws IllegalStateException if SHA-256 is not available
      * @author Ousseynou Diop
      * @author Wasif Ahmed
      */
@@ -282,8 +298,8 @@ public class Accounts
     }
 
     /**
-     * This creates a new random salt for a new account. The salt is a random value that's added before hashing  
-     * to prevent two people with same password having the same hash based on.
+     * Generates a new random salt for hashing passords and secredt answers
+     * so identical inputs do not produce indentical hashes.
      *
      * @return a random salt
      * @author Ousseynou Diop
@@ -301,6 +317,7 @@ public class Accounts
      * Reads all accounts from the users file.
      *
      * @return all the saved accounts, looked up by user name
+     * @throws UncheckedIOException if reading the users file fails
      * @author Ousseynou Diop
      * @author Wasif Ahmed
      */
@@ -333,6 +350,7 @@ public class Accounts
     /**
      * Saves all accounts to the users file.
      *
+     * @throws UncheckedIOException if writing to the users file fails
      * @author Ousseynou Diop
      * @author Wasif Ahmed
      */
@@ -352,31 +370,4 @@ public class Accounts
             throw new UncheckedIOException("Error: Could not save users file", e);
         }
     }
-
-    /**
-     * Verifies if the inputted password is correct.
-     * 
-     * @param account   the account to check the input against.
-     * @param password  the password to check.
-     * @return          true if the input matches the password stored in the Account and false otherwise.
-     * @author Wasif Ahmed
-    */
-    private static boolean verifyPassword(UserAccount account, String password)
-    {
-        return hashPassword(password, account.salt()).equals(account.passwordHash());
-    }
-
-    /**
-     * Verifies if the inputted secret answer is correct.
-     * 
-     * @param account   the account to check the input against.
-     * @param answer    the secret answer to check.
-     * @return          true if the input matches the secret answer stored in the Acccount and false otherwise.
-     * @author Wasif Ahmed
-     */
-    private static boolean verifySecretAnswer(UserAccount account, String answer)
-    {
-         return hashPassword(answer.trim().toLowerCase(), account.salt()).equals(account.secretAnswerHash());
-    }
-
 }
