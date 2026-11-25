@@ -20,7 +20,7 @@ public class Validation {
      * Verifies date strings in the CSV file are from the same
      * year and correctly formatted.
      *
-     * @param date date read from CSV file
+     * @param dateStr date read from CSV file
      * @return true if date is valid, false if format of date
      *         is incorrect or dates have different years
      * @author Eliott Edeki
