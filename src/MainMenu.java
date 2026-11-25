@@ -147,7 +147,6 @@ public class MainMenu {
      * Requests confirmation before overwriting an existing year's data and
      * lets the user skip invalid records or cancel the upload.
      * @throws InvalidPathException if the entered file path is syntactically invalid
-     * @throws IOException          if reading the CSV file or saving the budget fails
      * @author Sam Strugger
      */
     public void uploadAnnualData(){
@@ -357,7 +356,6 @@ public class MainMenu {
     /**
      * Prompts for a stored year and confirmation, then requests its deletion
      * through the Storage module.
-     * @throws IOException           if reading or deleting stored budget data fails
      * @throws IllegalStateException if year selection cannot be completed
      * @author Sam Strugger
      * @author Asher Malik
@@ -411,7 +409,6 @@ public class MainMenu {
      * Prompts for a stored year and console or CSV output, then coordinates
      * report generation with the Reports module.
      *
-     * @throws IOException           if reading stored budget data or exporting CSV fails
      * @throws IllegalStateException if year selection cannot be completed
      * @author Sam Strugger
      * @author Asher Malik
@@ -477,7 +474,6 @@ public class MainMenu {
      * exclusions, and choose a different year. Displays current exclusions
      * and the formatted report supplied by the Data Audit module.
      *
-     * @throws IOException           if reading budget data for auditing fails
      * @throws IllegalStateException if year selection cannot be completed
      * @author Sam Strugger
      */
