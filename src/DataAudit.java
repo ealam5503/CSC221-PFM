@@ -65,13 +65,13 @@ public class DataAudit {
 	}
 
 	/**
-	 * Finds transactions that repeat another one, meaning the same date, category
+	 * Finds potential duplicate transactions, meaning the same date, category
 	 * and amount appear more than once. Categories in the current exclusion set are
 	 * skipped. Flagged transactions returned as a list of {@link AuditFinding}.
 	 *
 	 * @param entries the transactions to check
 	 * @throws IllegalArgumentException if {@code entries} is null
-	 * @return list of findings, one per duplicated entry
+	 * @return list of findings, one entry per duplicated transaction
 	 * @author Genesis Vejar
 	 */
 	private List<AuditFinding> findDuplicates(List<Transaction> entries) {
@@ -128,7 +128,7 @@ public class DataAudit {
 	 *
 	 * @param entries the transactions to check
 	 * @throws IllegalArgumentException if {@code entries} is null
-	 * @return list of findings, one per anomalous entry
+	 * @return list of findings, one entry per anomalous transaction
 	 * @author Bobby Lu
 	 */
 	private List<AuditFinding> findAnomalies(List<Transaction> entries) {
@@ -237,7 +237,7 @@ public class DataAudit {
 	}
 
 	/**
-	 * Adds to the set of categories the audit will skip.
+	 * Adds a category to the set of categories the audit will skip.
 	 *
 	 * @param categories the categories to exclude, pass Category Enum as a varargs.
 	 * @throws IllegalArgumentException if {@code categories} is null

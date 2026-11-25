@@ -3,9 +3,9 @@
  * Instances are immutable.
  *
  * @param date     the date of the flagged transaction
- * @param category the category of the flagged transaction (e.g. "Compensation", "Food")
+ * @param category the Validation.Categories enum member of the flagged transaction (e.g. COMPENSATION, FOOD)
  * @param amount   the whole-dollar amount; income is positive, expenses are negative
- * @param auditType     whether the transaction was flagged as a duplicate or an anomaly
+ * @param auditType     the FindingType enum member assigned to the transaction (DUPLICATE or ANOMALY)
  * @param reason   a human-readable explanation of why it was flagged
  *
  * @author Andrew Zuniga
