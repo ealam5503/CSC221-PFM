@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 
 /**
- * takes care of user accounts for the PFM: creating an account, signing in,
+ * Takes care of user accounts for the PFM: creating an account, signing in,
  * signing out, changing a password, and deleting an account.
  *
  * Passwords and secret answers are never saved as plain text. They are
@@ -25,7 +25,10 @@ import java.nio.file.Paths;
  * @author Ousseynou Diop
  * @author Michael Lee
  * @author Wasif Ahmed
+ * @bug Fixed crash on startup when users.csv exists (Issue #29)
+ * @bug Fixed logic flaw where new password could be identical to the old password (Issue #40)
  */
+
 public class Accounts {
 
     /** Name of the file where all user accounts are saved. */
@@ -41,8 +44,8 @@ public class Accounts {
     private UserAccount currentUser;
 
     /**
-     * Creates the Accounts module with an empty account collection and 
-     * loads saved accounts will be implemented later.
+     * Creates the Accounts module and loads existing user accounts from the
+     * specified file path if it exists.
      *
      * @param usersFilePath where the users file is located
      * @author Ousseynou Diop
@@ -169,7 +172,7 @@ public class Accounts {
      * @param currentPassword       the user's current password
      * @param newPassword           the new password
      * @return                      true if the password was changed, false if the current
-*                                   password is wrong
+     *                              password is wrong
      * @author Ousseynou Diop
      * @author Michael Lee
      * @author Wasif Ahmed
@@ -274,6 +277,7 @@ public class Accounts {
      * @param plainText     the password or answer to hash
      * @param salt          a random value saved with the user's account
      * @return              the hashed text
+     * @throws IllegalStateException if SHA-256 is not available
      * @author Ousseynou Diop
      * @author Wasif Ahmed
      */
@@ -294,8 +298,8 @@ public class Accounts {
     }
 
     /**
-     * This creates a new random salt for a new account. The salt is a random value that's added before hashing  
-     * to prevent two people with same password having the same hash based on.
+     * Generates a new random salt for hashing passords and secredt answers
+     * so identical inputs do not produce indentical hashes.
      *
      * @return a random salt
      * @author Ousseynou Diop
@@ -313,6 +317,7 @@ public class Accounts {
      * Reads all accounts from the users file.
      *
      * @return all the saved accounts, looked up by user name
+     * @throws UncheckedIOException if reading the users file fails
      * @author Ousseynou Diop
      * @author Wasif Ahmed
      */
@@ -345,6 +350,7 @@ public class Accounts {
     /**
      * Saves all accounts to the users file.
      *
+     * @throws UncheckedIOException if writing to the users file fails
      * @author Ousseynou Diop
      * @author Wasif Ahmed
      */
