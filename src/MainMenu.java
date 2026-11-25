@@ -485,6 +485,8 @@ public class MainMenu {
      *
      * @throws IllegalStateException if year selection cannot be completed
      * @author Sam Strugger
+     * @author Asher Malik
+     * @bug #36 Category presented in "Exclude category" sub menu are off by one character space starting at option 10
      */
     public void auditAnnualData() {
         if (storage == null) {
@@ -559,9 +561,9 @@ public class MainMenu {
                     case 2:
                         System.out.println();
                         for (int i = 0; i < categories.length; i++) {
-                            System.out.println((i + 1) + ". " + categories[i].name().replace('_', ' '));
+                            System.out.printf("%2d. %s%n",(i + 1) + ". " + categories[i].name().replace('_', ' '));
                         }
-                        System.out.println("0. Return to audit menu");
+                        System.out.printf("%2d. Return to audit menu%n", 0);
 
                         while (true) {
                             System.out.print("Select a category to exclude (0-" + categories.length + "): ");
