@@ -31,10 +31,11 @@ public class Storage {
     }
 
     /**
-     * Reads every line of a text file.
+     * Reads every line of a text file in this Storage object's data folder.
+     * If the file does not exist, an empty list is returned instead of an error.
      *
-     * @param fileName the name or path of the file to read
-     * @return the lines from the file
+     * @param fileName the name of the file to read, relative to the data folder
+     * @return the lines from the file, or an empty list if the file does not exist
      * @throws IOException if the file cannot be read
      * @author Richard Medina
      */
@@ -56,9 +57,11 @@ public class Storage {
     }
 
     /**
-     * Writes the given lines of data to a text file.
+     * Writes the given lines of data to a text file in this Storage object's
+     * data folder, creating the folder if needed. An existing file with the
+     * same name is replaced.
      *
-     * @param fileName the name or path of the file to write
+     * @param fileName the name of the file to write, relative to the data folder
      * @param content the lines of data to write into the file
      * @throws IOException if the file cannot be written
      * @author Juan Balbuena
@@ -123,7 +126,8 @@ public class Storage {
     }
 
     /**
-     * Saves a budget between sessions.
+     * Saves a budget between sessions. Any budget already saved for the same
+     * year is replaced. Does nothing if the budget is null.
      *
      * @param budget the Budget object to save
      * @throws IOException if writing fails
@@ -157,9 +161,11 @@ public class Storage {
     }
 
     /**
-     * Deletes all budget data kept in this data directory.
+     * Deletes all budget data kept in this data directory, including the
+     * directory itself. Files that cannot be deleted are skipped without
+     * reporting an error.
      *
-     * @throws IOException if any of the data cannot be deleted
+     * @throws IOException if the data directory cannot be read
      * @author Tawseef Jadid
      */
     public void deleteData() throws IOException {
