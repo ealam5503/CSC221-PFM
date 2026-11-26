@@ -421,6 +421,7 @@ public class MainMenu {
      * @throws IllegalStateException if year selection cannot be completed
      * @author Sam Strugger
      * @author Asher Malik
+     * @bug #34 For the sake of consistency, the period after option 1 should be removed and a colon should be added after "Enter your choice (1 or 2)".
      */
     public void generateAnnualReport() {
         if (storage == null) {
@@ -450,9 +451,9 @@ public class MainMenu {
             }
 
             System.out.println("Select report output format:");
-            System.out.println("1. Display report to console.");
+            System.out.println("1. Display report to console");
             System.out.println("2. Export report to csv file");
-            System.out.println("Enter your choice (1 or 2)");
+            System.out.println("Enter your choice (1 or 2): ");
 
             if(!scanner.hasNextLine()){
                 return;
