@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -10,6 +11,9 @@ import java.util.Scanner;
  * Coordinates menu actions with the other teams' modules.
  *
  * @author Sam Strugger
+ * @bug Fixed missing exit options in submenus (Issue #32)
+ * @bug Fixed UX punctuation inconsistencies in the main menu (Issue #34)
+ * @bug Fixed UX misaligned options in the category exclusion sub-menu (Issue #36)
  */
 public class MainMenu {
     private final Scanner scanner;
@@ -46,6 +50,8 @@ public class MainMenu {
         System.out.println("3. Generate annual report");
         System.out.println("4. Audit annual data");
         System.out.println("5. Sign out");
+        System.out.println("6. Change password");
+        System.out.println("7. Delete account");
         System.out.println();
         System.out.print("Enter your selection: ");
     }
@@ -69,7 +75,7 @@ public class MainMenu {
             try {
                 selection = Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.err.println("Please enter a number between 1 and 5.");
+                System.err.println("Please enter a number between 1 and 7.");
                 continue;
             }
 
@@ -89,8 +95,14 @@ public class MainMenu {
                 case 5:
                     signOut();
                     return;
+                case 6:
+                    changePassword();
+                    return;
+                case 7:
+                    deleteUser();
+                    return;
                 default:
-                    System.err.println("Please enter a number between 1 and 5.");
+                    System.err.println("Please enter a number between 1 and 7.");
             }
         }
     }
@@ -100,6 +112,7 @@ public class MainMenu {
      * The calling action must first check that stored years are available.
      *
      * @return the selected budget year
+     * @throws IllegalStateException if no stored budget years exist or console input ends early
      * @author Sam Strugger
      */
     public int selectYear() {
@@ -142,7 +155,7 @@ public class MainMenu {
      * Prompts for an annual CSV file and coordinates validation and storage.
      * Requests confirmation before overwriting an existing year's data and
      * lets the user skip invalid records or cancel the upload.
-     *
+     * @throws InvalidPathException if the entered file path is syntactically invalid
      * @author Sam Strugger
      */
     public void uploadAnnualData(){
@@ -352,7 +365,7 @@ public class MainMenu {
     /**
      * Prompts for a stored year and confirmation, then requests its deletion
      * through the Storage module.
-     *
+     * @throws IllegalStateException if year selection cannot be completed
      * @author Sam Strugger
      * @author Asher Malik
      */
@@ -405,8 +418,10 @@ public class MainMenu {
      * Prompts for a stored year and console or CSV output, then coordinates
      * report generation with the Reports module.
      *
+     * @throws IllegalStateException if year selection cannot be completed
      * @author Sam Strugger
      * @author Asher Malik
+     * @bug #34 For the sake of consistency, the period after option 1 should be removed and a colon should be added after "Enter your choice (1 or 2)".
      */
     public void generateAnnualReport() {
         if (storage == null) {
@@ -436,9 +451,9 @@ public class MainMenu {
             }
 
             System.out.println("Select report output format:");
-            System.out.println("1. Display report to console.");
+            System.out.println("1. Display report to console");
             System.out.println("2. Export report to csv file");
-            System.out.println("Enter your choice (1 or 2)");
+            System.out.println("Enter your choice (1 or 2): ");
 
             if(!scanner.hasNextLine()){
                 return;
@@ -469,7 +484,11 @@ public class MainMenu {
      * exclusions, and choose a different year. Displays current exclusions
      * and the formatted report supplied by the Data Audit module.
      *
+     * @throws IllegalStateException if year selection cannot be completed
      * @author Sam Strugger
+     * @author Asher Malik
+     * @bug #36 Category presented in "Exclude category" sub menu are off by one character space starting at option 10
+     * @bug #37 Although not critical, it would be beneficial to shrink the option menu when excluding a category.
      */
     public void auditAnnualData() {
         if (storage == null) {
@@ -542,14 +561,23 @@ public class MainMenu {
                         System.out.println(dataAudit.runAudit(entries));
                         break;
                     case 2:
-                        System.out.println();
-                        for (int i = 0; i < categories.length; i++) {
-                            System.out.println((i + 1) + ". " + categories[i].name().replace('_', ' '));
-                        }
-                        System.out.println("0. Return to audit menu");
-
                         while (true) {
-                            System.out.print("Select a category to exclude (0-" + categories.length + "): ");
+                            List<Category> available = new ArrayList<>();
+                            for(Category c : categories){
+                                if(!dataAudit.getExcludedCategories().contains(c)){
+                                    available.add(c);
+                                }
+                            }
+                            if(available.isEmpty()){
+                                System.out.println("All categories are already excluded");
+                                break;
+                            }
+                            System.out.println();
+                            for (int i = 0; i < available.size(); i++) {
+                                System.out.printf("%2d. %s%n", (i + 1), available.get(i).name().replace('_', ' '));
+                            }
+                            System.out.printf("%2d. Return to audit menu%n", 0);
+                            System.out.print("Select a category to exclude (0-" + available.size() + "): ");
                             if (!scanner.hasNextLine()) {
                                 return;
                             }
@@ -570,7 +598,7 @@ public class MainMenu {
                                 continue;
                             }
 
-                            Category category = categories[categorySelection - 1];
+                            Category category = available.get(categorySelection-1);
                             dataAudit.setExcludedCategories(category);
                             System.out.println("Excluded " + category.name().replace('_', ' ') + ".");
                         }
@@ -592,6 +620,102 @@ public class MainMenu {
             System.err.println("Could not read the budget data: " + e.getMessage());
         } catch (IllegalStateException e) {
             System.err.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Prompts the signed-in user for their current password and a new password.
+     * Blank input returns to the main menu without making a change.
+     *
+     * @bug Added access to signed-in password changes (Issue #38)
+     * @author Sam Strugger
+     */
+    public void changePassword(){
+
+        if (!accounts.isSignedIn()){
+            System.err.println("Sign in before changing your password.");
+            return;
+        }
+
+        System.out.print("Current password (leave blank to cancel): ");
+        if (!scanner.hasNextLine()) return;
+
+        String currentPassword = scanner.nextLine();
+        if (currentPassword.isEmpty()) return;
+
+        System.out.println("New passwords must have at least " + Validation.MIN_PASSWORD_LENGTH + " characters with no spaces.");
+
+        while (true){
+            System.out.print("New password (leave blank to cancel): ");
+            if (!scanner.hasNextLine()) return;
+
+            String newPassword = scanner.nextLine();
+            if (newPassword.isEmpty()) return;
+
+            if (!Validation.inputValidate(newPassword, Validation.InputType.PASSWORD, 0, 0)){
+                System.err.println("Use at least " + Validation.MIN_PASSWORD_LENGTH + " characters with no spaces.");
+                continue;
+            }
+            if (newPassword.equals(currentPassword)){
+                System.err.println("Choose a password different from your current password.");
+                continue;
+            }
+
+            try {
+                if (accounts.changePassword(currentPassword, newPassword)){
+                    System.out.println("Your password has been changed.");
+                } else {
+                    System.err.println("The current password was incorrect. Your password has not been changed.");
+                }
+            } catch (UncheckedIOException e) {
+                System.err.println("Could not save the password change: " + e.getMessage());
+            }
+            return;
+        }
+    }
+
+    /**
+     * Confirms account deletion with the signed-in user's password, then
+     * requests removal of their saved budgets through Storage.
+     * Blank input or declining confirmation returns to the main menu.
+     *
+     * @author Sam Strugger
+     */
+    public void deleteUser(){
+
+        if (!accounts.isSignedIn()){
+            System.err.println("Sign in before deleting your account.");
+            return;
+        }
+
+        System.out.println("Deleting your account will also remove all of your saved budget data.");
+        System.out.print("Password (leave blank to cancel): ");
+        if (!scanner.hasNextLine()) return;
+
+        String password = scanner.nextLine();
+        if (password.isEmpty()) return;
+
+        if (!confirmAction("Delete your account and saved budget data? (y/n): ")){
+            System.out.println("Account deletion canceled.");
+            return;
+        }
+
+        try {
+            if (!accounts.deleteUser(password)){
+                System.err.println("Incorrect password. Your account has not been deleted.");
+                return;
+            }
+        } catch (UncheckedIOException e) {
+            System.err.println("Could not save the account deletion: " + e.getMessage());
+            return;
+        }
+
+        budgetYears = new ArrayList<>();
+        try {
+            storage.deleteData();
+            System.out.println("Your account has been deleted.");
+        } catch (IOException e) {
+            System.err.println("Your account was deleted, but saved budget data could not be removed: " + e.getMessage());
         }
     }
 
